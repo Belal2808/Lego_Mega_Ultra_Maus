@@ -66,7 +66,6 @@ class Outgoing: JPanel() {
             sendMessage()
         }
 
-        Autocomplete(message, listOfOSC)
 
         val messageConstraints = GridBagConstraints()
         messageConstraints.weightx = 1.0

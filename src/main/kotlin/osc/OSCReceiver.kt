@@ -7,7 +7,7 @@ import de.fhkiel.rob.legoosctester.gui.Incoming.log
 import kotlin.concurrent.thread
 
 object OSCReceiver {
-    var port: Int = -1
+    var port: Int = 9001
         private set
     private lateinit var receiver: OSCPortIn
 
