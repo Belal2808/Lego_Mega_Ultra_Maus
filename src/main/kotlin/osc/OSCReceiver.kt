@@ -11,21 +11,31 @@ object OSCReceiver {
         private set
     private lateinit var receiver: OSCPortIn
 
-    fun start(port: Int = 9001){
+    private val listeners = mutableListOf<(String, List<Any>) -> Unit>()
+
+    var prefixFilter: String = "/OSCBrick@192.168.178.152"
+
+    fun addListener(listener: (String, List<Any>) -> Unit) {
+        listeners.add(listener)
+    }
+
+    fun start(port: Int = 9001) {
         receiver = OSCPortIn(port)
         receiver.dispatcher.addListener(
             object : MessageSelector {
-                override fun isInfoRequired(): Boolean {
-                    return false
-                }
+                override fun isInfoRequired(): Boolean = false
 
                 override fun matches(messageEvent: OSCMessageEvent?): Boolean {
-                    return true
+                    // Filter basierend auf dem Prefix
+                    return messageEvent?.message?.address?.startsWith(prefixFilter) == true
                 }
             }
         ) { event ->
             if (event != null) {
-                newMessage(event.message.address, event.message.arguments)
+                val path = event.message.address
+                val args = event.message.arguments
+                listeners.forEach { it(path, args) }
+                newMessage(path, args)
             }
         }
         thread { receiver.startListening() }
@@ -33,14 +43,14 @@ object OSCReceiver {
         this.port = port
     }
 
-    fun stop(){
-        if(this::receiver.isInitialized) {
+    fun stop() {
+        if (this::receiver.isInitialized) {
             receiver.stopListening()
             this.port = -1
         }
     }
 
-    private fun newMessage(path: String, args: List<Any>){
-        log(path,"${args}")
+    private fun newMessage(path: String, args: List<Any>) {
+        log(path, "${args}")
     }
 }

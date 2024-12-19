@@ -1,10 +1,10 @@
 package de.fhkiel.rob.legoosctester
 
 data class Cell(
-    val top : CellBoarder,
-    val bottom : CellBoarder,
-    val left : CellBoarder,
-    val right : CellBoarder
+    val north : CellBoarder,
+    val east : CellBoarder,
+    val south : CellBoarder,
+    val west : CellBoarder
 )
 
 enum class CellBoarder{

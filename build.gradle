@@ -13,7 +13,6 @@ dependencies {
     implementation 'org.slf4j:slf4j-simple:2.0.16'
     implementation 'com.illposed.osc:javaosc-core:0.9'
     implementation("io.insert-koin:koin-core:4.0.0")
-    implementation("io.insert-koin:koin-core-ext:4.0.0")
     implementation("io.insert-koin:koin-logger-slf4j:4.0.0")
 }
 
