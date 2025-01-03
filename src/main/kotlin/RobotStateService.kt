@@ -6,8 +6,8 @@ interface RobotStateService {
 
     fun getAngle(): Pair<Int, Int>
     fun setAngle(x: Int, y: Int)
-    fun getDirection(): Direction
-    fun setDirection(direction: Direction)
-    fun setEyesAngle(direction: Direction)
-    fun getEyesAngle(): Direction
+    fun getRoboterDirection(): RoboterDirection
+    fun setRoboterDirection(direction: RoboterDirection)
+    fun setEyesDirection(direction: EyesDirection)
+    fun getEyesDirection(): EyesDirection
 }
