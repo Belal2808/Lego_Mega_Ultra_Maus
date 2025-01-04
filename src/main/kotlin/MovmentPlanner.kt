@@ -7,46 +7,35 @@ class MovementPlanner(
 ) {
     fun planAndExecuteRoboterMovement(targetDirection: RoboterDirection) {
         val currentDirection = robotState.getRoboterDirection()
-        val movements = determineRoboterMovementsForDirection(currentDirection, targetDirection)
-        // Bewegungen an den MovementManager übergeben
+        val movements = calculateMovementToTargetDirection(currentDirection, targetDirection)
         movements.forEach { movement ->
             movementManager.enqueueMovement(movement)
         }
     }
 
-    fun planAndExecuteEyeMovement(targetDirection: RoboterDirection){
+    fun planAndExecuteEyeMovement(targetDirection: EyesDirection){
 
     }
 
-    private fun determineRoboterMovementsForDirection(
-        currentDirection: RoboterDirection,
-        targetDirection: RoboterDirection
-    ): List<() -> Unit> {
+    private fun calculateMovementToTargetDirection(currentDirection: RoboterDirection, targetDirection: RoboterDirection): List<() -> Unit> {
         val movements = mutableListOf<() -> Unit>()
 
-        when (targetDirection) {
-            RoboterDirection.NORTH -> {
-                when (currentDirection) {
-                    RoboterDirection.EAST -> {
-                        movements.add {robotController.turnEyes(EyesDirection.FRONT)  }
-                    }
-                    RoboterDirection.WEST -> {
-                        movements.add {robotController.turnEyes(EyesDirection.FRONT)  }
-                    }
-                    RoboterDirection.SOUTH -> {
-                        movements.add { robotController.turnEyes(EyesDirection.FRONT)  }
-                    }
-                    RoboterDirection.NORTH -> {
-                    }
-                }
-                movements.add {  robotController.turnEyes(EyesDirection.FRONT)  }
+        val difference = (targetDirection.value - currentDirection.value + 4) % 4
+
+        when (difference) {
+            1 -> {
+                movements.add  { robotController.turnRight90Degree() }
             }
-            RoboterDirection.WEST -> movements.add { robotController.turnEyes(EyesDirection.FRONT) }
-            RoboterDirection.SOUTH -> movements.add { robotController.turnEyes(EyesDirection.FRONT)  }
-            RoboterDirection.EAST -> movements.add { robotController.turnEyes(EyesDirection.FRONT)  }
+            2 -> {
+                movements.add { robotController.turn180Degree() }
+            }
+            3 -> {
+                movements.add { robotController.turnLeft90Degree() }
+            }
         }
+
+        movements.add {  robotController.driveToNextCell() }
+
         return movements
     }
-
-
 }
