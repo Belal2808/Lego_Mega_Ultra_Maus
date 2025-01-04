@@ -1,12 +1,11 @@
 package de.fhkiel.rob.legoosctester
 
-import org.koin.mp.KoinPlatform.getKoin
 
 class RoboterState() : RobotStateService {
     private var roboterDirection: RoboterDirection = RoboterDirection.NORTH
     private var eyesDirection : EyesDirection = EyesDirection.LEFT
     override var robotPort: Int = 9001
-    override var robotIp: String = "192.168.178.152"
+    override var robotIp: String = "192.168.2.126"
 
     override fun setAngle(x: Int, y: Int) {
         TODO("Not yet implemented")
