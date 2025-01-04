@@ -17,43 +17,43 @@ class RobotController {
         OSCReceiver.addListener { path, args ->
             onMessageReceived(path, args)
         }
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/c/angle", 0)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/c/angle", 0)
     }
 
     fun driveToNextCell(){
         currentControl = RoboterControls.FORWARD
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/bc/angle", 0)
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/bc/multirun/target", 100, 140, 140)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/bc/angle", 0)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/bc/multirun/target", 100, 140, 140)
     }
 
     fun headbuttWall(){
         currentControl = RoboterControls.AGAINSTWALL
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/bc/angle", 0)
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/bc/multirun/target", 100, 140, 140)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/bc/angle", 0)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/bc/multirun/target", 100, 140, 140)
 
     }
 
     fun turnLeft90Degree(){
         currentControl = RoboterControls.LEFTTURN
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/gyroscope/s3/angle", 0)
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/bc/angle", 0)
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/bc/multirun/target", 100, 140, -140)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/gyroscope/s3/angle", 0)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/bc/angle", 0)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/bc/multirun/target", 100, 140, -140)
     }
 
     fun turnRight90Degree(){
         currentControl = RoboterControls.RIGHTTURN
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.179/gyroscope/s1/angle", 0)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/gyroscope/s1/angle", 0)
         sleep(5)
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/ab/angle", 0)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/angle", 0)
         sleep(100)
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/ab/multirun/target", 200, -170, 170)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/multirun/target", 200, -170, 170)
     }
 
     fun turn180Degree(){
         currentControl = RoboterControls.TURN180DEGREES
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/gyroscope/s3/angle", 0)
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/bc/angle", 0)
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/bc/multirun/target", 100, -280, 280)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/gyroscope/s3/angle", 0)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/bc/angle", 0)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/bc/multirun/target", 100, -280, 280)
 
     }
 
@@ -61,34 +61,34 @@ class RobotController {
 
         when (eyesDirection){
             EyesDirection.LEFT->{
-                OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/c/run/target", 300, 0)
+                OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/c/run/target", 300, 0)
                 roboterState.setEyesDirection(eyesDirection)
             }
             EyesDirection.FRONT->{
-                OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/c/run/target", 300, 95)
+                OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/c/run/target", 300, 95)
                 roboterState.setEyesDirection(eyesDirection)
             }
             EyesDirection.RIGHT -> {
-                OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/c/run/target", 300, 185)
+                OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/c/run/target", 300, 185)
                 roboterState.setEyesDirection(eyesDirection)
             }
             EyesDirection.BACK -> {
-                OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/motor/c/run/target", 300, 275)
+                OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/c/run/target", 300, 275)
                 roboterState.setEyesDirection(eyesDirection)
             }
         }
     }
 
     fun look(){
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/ultrasonic/s1/distance")
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/ultrasonic/s1/distance")
     }
 
     fun smellColor(){
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/192.168.178.152/color/s2")
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/color/s2")
     }
 
     private fun onMessageReceived(path: String, args: List<Any>) {
-        if (path == "/OSCBrick@192.168.178.152/motor/c/target/reached") {
+        if (path == "/OSCBrick@${roboterState.robotIp}/motor/c/target/reached") {
             when(args[0]){
                 0-> {print("augen gucken nach links\n")
                     roboterState.setEyesDirection(EyesDirection.LEFT)
