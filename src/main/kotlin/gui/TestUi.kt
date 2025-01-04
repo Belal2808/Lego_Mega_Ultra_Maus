@@ -3,6 +3,7 @@ package de.fhkiel.rob.legoosctester
 import de.fhkiel.rob.legoosctester.gui.Incoming
 import de.fhkiel.rob.legoosctester.gui.Outgoing
 import de.fhkiel.rob.legoosctester.osc.OSCSender
+import org.koin.mp.KoinPlatform.getKoin
 import java.awt.Dimension
 import java.awt.GridLayout
 import javax.swing.JButton
@@ -17,6 +18,8 @@ class TestGui: JFrame() {
         minimumSize =  Dimension(400, 400)
         defaultCloseOperation = EXIT_ON_CLOSE
         val robotController = RobotController()
+        //val labyrinthExplorer: LabyrinthExplorer = getKoin().get()  // LabyrinthExplorer instanziieren
+
 
         layout = GridLayout(3, 3)
         add(JPanel())
@@ -35,7 +38,7 @@ class TestGui: JFrame() {
         add(JPanel())
         val right = JButton(">")
         right.addActionListener {
-           robotController.turnEyes(EyesDirection.RIGHT)
+            //labyrinthExplorer.explore()
         }
         add(right)
         add(JPanel())

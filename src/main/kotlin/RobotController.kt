@@ -10,8 +10,10 @@ enum class RoboterControls{
 }
 
 class RobotController {
-    val roboterState : RobotStateService = getKoin().get()
-    var currentControl: RoboterControls = RoboterControls.NONE
+    private val roboterState : RobotStateService = getKoin().get()
+    private var currentControl: RoboterControls = RoboterControls.NONE
+    private val movementListeners = mutableListOf<(RoboterControls) -> Unit>()
+
 
     init {
         OSCReceiver.addListener { path, args ->
@@ -85,6 +87,14 @@ class RobotController {
 
     fun smellColor(){
         OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/color/s2")
+    }
+
+    fun addMovementCompleteListener(listener: (RoboterControls) -> Unit) {
+        movementListeners.add(listener)
+    }
+
+    private fun notifyMovementComplete(control: RoboterControls) {
+        movementListeners.forEach { it(control) }
     }
 
     private fun onMessageReceived(path: String, args: List<Any>) {
