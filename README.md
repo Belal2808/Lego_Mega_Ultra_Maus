@@ -7,3 +7,13 @@ OscTester in Kotlin
 
 ## Changes
 - added autocomplete: uses ctrl + space
+
+## Ports
+- s1 -> Distance
+- s2 -> Color
+- s3 -> Gyro
+- s4 -> Touch
+---
+- a -> Wheel
+- b -> Wheel
+- c -> Motor for distance sensor

@@ -2,11 +2,18 @@ package de.fhkiel.rob.legoosctester
 
 enum class RoboterDirection(val value: Int) {
     NORTH(0),
-    WEST(1),
+    EAST(1),
     SOUTH(2),
-    EAST(3);
+    WEST(3);
 }
 
 enum class EyesDirection(val value: Int){
-    LEFT(0),FRONT(1),RIGHT(2),BACK(3)
+    FRONT(0),RIGHT(1),BACK(2),LEFT(3);
+
+    companion object {
+
+        fun fromValue(value: Int): EyesDirection? {
+            return entries.find { it.value == value }
+        }
+    }
 }

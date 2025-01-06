@@ -11,13 +11,16 @@ import javax.swing.JFrame
 import javax.swing.JFrame.EXIT_ON_CLOSE
 import javax.swing.JPanel
 
-class TestGui: JFrame() {
+class TestGui: JFrame(
 
+) {
+    private val robotController: RobotController = getKoin().get()
     init {
+
         title = "ButtonKram"
         minimumSize =  Dimension(400, 400)
         defaultCloseOperation = EXIT_ON_CLOSE
-        val robotController = RobotController()
+
         //val labyrinthExplorer: LabyrinthExplorer = getKoin().get()  // LabyrinthExplorer instanziieren
 
 

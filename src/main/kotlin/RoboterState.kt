@@ -3,9 +3,12 @@ package de.fhkiel.rob.legoosctester
 
 class RoboterState() : RobotStateService {
     private var roboterDirection: RoboterDirection = RoboterDirection.NORTH
-    private var eyesDirection : EyesDirection = EyesDirection.LEFT
+    private var eyesDirection : EyesDirection = EyesDirection.FRONT
     override var robotPort: Int = 9001
-    override var robotIp: String = "192.168.2.126"
+    override var robotIp: String = "192.168.178.152"
+    override var motorATargetReached: Boolean = false
+    override var motorBTargetReached: Boolean = false
+    override var scannedDistance: Int = 0
 
     override fun setAngle(x: Int, y: Int) {
         TODO("Not yet implemented")

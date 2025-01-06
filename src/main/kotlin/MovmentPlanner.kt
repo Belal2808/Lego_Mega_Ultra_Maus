@@ -8,13 +8,27 @@ class MovementPlanner(
     fun planAndExecuteRoboterMovement(targetDirection: RoboterDirection) {
         val currentDirection = robotState.getRoboterDirection()
         val movements = calculateMovementToTargetDirection(currentDirection, targetDirection)
-        movements.forEach { movement ->
-            movementManager.enqueueMovement(movement)
-        }
+        robotState.setRoboterDirection(targetDirection)
+        movementManager.enqueueMovements(movements)
     }
 
-    fun planAndExecuteEyeMovement(targetDirection: EyesDirection){
+    fun planAndExecuteEyeMovement(targetDirection: RoboterDirection){
+        val currentRoboterDirection = robotState.getRoboterDirection()
+        val movements = calculateEyeMovementToTargetDirection(currentRoboterDirection,targetDirection)
+        movementManager.enqueueMovements(movements)
 
+    }
+
+    private fun calculateEyeMovementToTargetDirection( currentDirection: RoboterDirection, targetDirection: RoboterDirection): List<() -> Unit> {
+        val movements = mutableListOf<() -> Unit>()
+
+        val difference =  (targetDirection.value - currentDirection.value + 4) % 4
+
+        val direction = EyesDirection.fromValue(difference) ?: return movements
+
+        movements.addAll(robotController.turnEyes(direction))
+
+        return movements
     }
 
     private fun calculateMovementToTargetDirection(currentDirection: RoboterDirection, targetDirection: RoboterDirection): List<() -> Unit> {
@@ -24,17 +38,17 @@ class MovementPlanner(
 
         when (difference) {
             1 -> {
-                movements.add  { robotController.turnRight90Degree() }
+                movements.addAll(robotController.turnRight90Degree())
             }
             2 -> {
-                movements.add { robotController.turn180Degree() }
+                movements.addAll(robotController.turn180Degree())
             }
             3 -> {
-                movements.add { robotController.turnLeft90Degree() }
+                movements.addAll(robotController.turnLeft90Degree())
             }
         }
 
-        movements.add {  robotController.driveToNextCell() }
+        movements.addAll(robotController.driveToNextCell())
 
         return movements
     }
