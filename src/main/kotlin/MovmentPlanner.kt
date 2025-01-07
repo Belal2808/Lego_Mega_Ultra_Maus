@@ -19,6 +19,12 @@ class MovementPlanner(
 
     }
 
+    fun resetEyes(){
+        val movements = mutableListOf<() -> Unit>()
+        movements.addAll(robotController.turnEyes(EyesDirection.FRONT))
+        movementManager.enqueueMovements(movements)
+    }
+
     private fun calculateEyeMovementToTargetDirection( currentDirection: RoboterDirection, targetDirection: RoboterDirection): List<() -> Unit> {
         val movements = mutableListOf<() -> Unit>()
 

@@ -22,12 +22,12 @@ class MovementManager(
         if (movementQueue.isNotEmpty()) {
             isProcessingMovement = true
             val nextMovement = movementQueue.removeAt(0)
-            println("Executing movement: $nextMovement")
             nextMovement()
         }
     }
 
     private fun onMovementComplete() {
+        print(movementQueue.size)
         isProcessingMovement = false
         processNextMovement()
     }

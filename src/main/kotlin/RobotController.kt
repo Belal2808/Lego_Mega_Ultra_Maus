@@ -12,6 +12,7 @@ enum class RoboterControls{
 class RobotController {
     private val roboterState : RobotStateService = getKoin().get()
     private val movementListeners = mutableListOf<(RoboterControls) -> Unit>()
+    private val labyrinthState: LabyrinthStateService = getKoin().get()
 
 
     init {
@@ -125,6 +126,23 @@ class RobotController {
                 }
         }else if(path == "/OSCBrick@${roboterState.robotIp}/motor/c/angle/is" && args[0] == 0){
             // do nothing
+        }else if(path == "/OSCBrick@${roboterState.robotIp}/ultrasonic/s1/distance/is"){
+
+            val currentCell = labyrinthState.getCell(labyrinthState.getRobotPosition())
+            val list = currentCell?.getUndiscoveredBorders()
+
+            if(list!!.isEmpty()){
+                notifyMovementComplete(RoboterControls.NONE)
+                return
+            }
+            if(args[0] as Int >250){
+                println(list.first())
+                currentCell.setBorder(list.first(),CellBoarder.UNDISCOVERED)
+            }else{
+                println(list.first())
+                currentCell.setBorder(list.first(),CellBoarder.WALL)
+            }
+         notifyMovementComplete(RoboterControls.NONE)
         }else{
          notifyMovementComplete(RoboterControls.NONE)
      }

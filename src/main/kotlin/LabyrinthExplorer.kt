@@ -1,26 +1,31 @@
 package de.fhkiel.rob.legoosctester
 
 class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService, private val movementPlanner: MovementPlanner){
-    var lastCellDirection :RoboterDirection? = null
+    private var lastCellDirection :RoboterDirection? = null
 
-    fun exploreCell() {
-        labyrinthStateService.getCell(labyrinthStateService.getRobotPosition())
-    }
 
     fun driveWest(){
         lastCellDirection = RoboterDirection.EAST
+        val roboterPosition = labyrinthStateService.getRobotPosition()
+        labyrinthStateService.setRobotPosition(roboterPosition.first-1,roboterPosition.second)
         movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.WEST)
     }
     fun driveNorth(){
         lastCellDirection = RoboterDirection.SOUTH
+        val roboterPosition = labyrinthStateService.getRobotPosition()
+        labyrinthStateService.setRobotPosition(roboterPosition.first,roboterPosition.second+1)
         movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.NORTH)
     }
     fun driveEast(){
         lastCellDirection = RoboterDirection.WEST
+        val roboterPosition = labyrinthStateService.getRobotPosition()
+        labyrinthStateService.setRobotPosition(roboterPosition.first+1,roboterPosition.second)
         movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.EAST)
     }
     fun driveSouth(){
         lastCellDirection = RoboterDirection.NORTH
+        val roboterPosition = labyrinthStateService.getRobotPosition()
+        labyrinthStateService.setRobotPosition(roboterPosition.first,roboterPosition.second-1)
         movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.SOUTH)
     }
 
@@ -29,6 +34,7 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
         if(currentCell == null){
             currentCell = Cell()
         }
+        labyrinthStateService.updateCell(labyrinthStateService.getRobotPosition().first,labyrinthStateService.getRobotPosition().second,currentCell)
         val direction = lastCellDirection
         if (direction != null) {
             currentCell.setBorder(direction, CellBoarder.DISCOVERED)
@@ -39,7 +45,10 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
                 movementPlanner.planAndExecuteEyeMovement(undiscoveredBoarder)
             }
         }
-
-
+        movementPlanner.resetEyes()
+    }
+    fun printCellBoarders(){
+        val currentCell = labyrinthStateService.getCell(labyrinthStateService.getRobotPosition())
+        print(currentCell!!.borders.toString())
     }
 }

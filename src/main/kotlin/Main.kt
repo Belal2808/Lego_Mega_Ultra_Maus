@@ -18,6 +18,5 @@ val appModule = module {
 fun main() {
     startKoin { modules(appModule) }
     Base()
-    val labyrinthExplorer: LabyrinthExplorer = getKoin().get()
     OSCReceiver.start()
 }
