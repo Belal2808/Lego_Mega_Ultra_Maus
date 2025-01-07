@@ -13,4 +13,7 @@ val appModule = module {
 
 fun main() {
     MainGUI()
+    startKoin { modules(appModule) }
+    //Base()
+    OSCReceiver.start()
 }
