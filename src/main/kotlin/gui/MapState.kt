@@ -2,22 +2,45 @@ package de.fhkiel.rob.labyrinth.gui
 
 import de.fhkiel.rob.legoosctester.Cell
 import de.fhkiel.rob.legoosctester.CellBoarder
+import de.fhkiel.rob.legoosctester.RoboterDirection
 import de.fhkiel.rob.legoosctester.gui.MapController
 import java.awt.Color
-import java.util.*
+import java.util.PriorityQueue
 
 class MapState {
     private val cells = mutableMapOf<Pair<Int, Int>, Cell>() // Map von Koordinaten zu Zellen
 
-    // Fügt eine Zelle hinzu oder aktualisiert sie
+    /**
+     * Fügt eine Zelle hinzu oder aktualisiert sie.
+     */
     fun addCell(x: Int, y: Int, cell: Cell) {
         cells[Pair(x, y)] = cell
     }
 
-    // Ruft alle Zellen ab
+    /**
+     * Ruft alle Zellen ab.
+     */
     fun getCells(): Map<Pair<Int, Int>, Cell> {
         return cells
     }
+
+    /**
+     * Ruft eine Zelle ab, wenn sie existiert, sonst null.
+     */
+    fun getCell(x: Int, y: Int): Cell? {
+        return cells[Pair(x, y)]
+    }
+
+    /**
+     * Überprüft, ob eine Zelle an einer bestimmten Position existiert.
+     */
+    fun hasCell(x: Int, y: Int): Boolean {
+        return cells.containsKey(Pair(x, y))
+    }
+
+    /**
+     * Gibt die erreichbaren Nachbarn einer Zelle zurück, basierend auf den Rändern.
+     */
     fun getNeighbors(x: Int, y: Int): List<Pair<Int, Int>> {
         val neighbors = mutableListOf<Pair<Int, Int>>()
 
@@ -28,27 +51,46 @@ class MapState {
         }
 
         // Nachbarn prüfen und bidirektionale Verbindungen sicherstellen
-        if (currentCell.north != CellBoarder.WALL) {
+        // NORTH
+        if (currentCell.getBorder(RoboterDirection.NORTH) != CellBoarder.WALL) {
             val northCell = getCell(x, y - 1)
-            if (northCell != null && northCell.south != CellBoarder.WALL && !northCell.isBlocked) {
+            if (northCell != null &&
+                northCell.getBorder(RoboterDirection.SOUTH) != CellBoarder.WALL &&
+                !northCell.isBlocked
+            ) {
                 neighbors.add(Pair(x, y - 1))
             }
         }
-        if (currentCell.east != CellBoarder.WALL) {
+
+        // EAST
+        if (currentCell.getBorder(RoboterDirection.EAST) != CellBoarder.WALL) {
             val eastCell = getCell(x + 1, y)
-            if (eastCell != null && eastCell.west != CellBoarder.WALL && !eastCell.isBlocked) {
+            if (eastCell != null &&
+                eastCell.getBorder(RoboterDirection.WEST) != CellBoarder.WALL &&
+                !eastCell.isBlocked
+            ) {
                 neighbors.add(Pair(x + 1, y))
             }
         }
-        if (currentCell.south != CellBoarder.WALL) {
+
+        // SOUTH
+        if (currentCell.getBorder(RoboterDirection.SOUTH) != CellBoarder.WALL) {
             val southCell = getCell(x, y + 1)
-            if (southCell != null && southCell.north != CellBoarder.WALL && !southCell.isBlocked) {
+            if (southCell != null &&
+                southCell.getBorder(RoboterDirection.NORTH) != CellBoarder.WALL &&
+                !southCell.isBlocked
+            ) {
                 neighbors.add(Pair(x, y + 1))
             }
         }
-        if (currentCell.west != CellBoarder.WALL) {
+
+        // WEST
+        if (currentCell.getBorder(RoboterDirection.WEST) != CellBoarder.WALL) {
             val westCell = getCell(x - 1, y)
-            if (westCell != null && westCell.east != CellBoarder.WALL && !westCell.isBlocked) {
+            if (westCell != null &&
+                westCell.getBorder(RoboterDirection.EAST) != CellBoarder.WALL &&
+                !westCell.isBlocked
+            ) {
                 neighbors.add(Pair(x - 1, y))
             }
         }
@@ -57,18 +99,9 @@ class MapState {
         return neighbors
     }
 
-
-
-
-    // Überprüft, ob eine Zelle an einer bestimmten Position existiert
-    fun hasCell(x: Int, y: Int): Boolean {
-        return cells.containsKey(Pair(x, y))
-    }
-
-    // Ruft eine Zelle ab, wenn sie existiert, sonst null
-    fun getCell(x: Int, y: Int): Cell? {
-        return cells[Pair(x, y)]
-    }
+    /**
+     * Findet einen Pfad von Start zu Ziel unter Verwendung des Dijkstra-Algorithmus.
+     */
     fun findPathDijkstra(start: Pair<Int, Int>, goal: Pair<Int, Int>): List<Pair<Int, Int>> {
         // Überprüfen, ob Start und Ziel existieren
         if (getCell(start.first, start.second) == null) {
@@ -135,36 +168,12 @@ class MapState {
 
         return path
     }
-    private fun resetColorFields(mapState: MapState, mapController: MapController) {
-        // Durchlaufe alle Zellen
-        for ((coords, cell) in mapState.getCells()) {
-            // Prüfe, ob die Farbe (rot, grün oder blau) ist
-            // und ob isColorField = false ist (abgefahren)
-            val c = cell.color
-            val isRGB = (c == Color.RED || c == Color.GREEN || c == Color.BLUE)
 
-            if (isRGB && !cell.isColorField) {
-                // Reaktiviere diese Zelle
-                mapController.addSimulatedCell(
-                    coords.first, coords.second,
-                    // Farbe bleibt die gleiche
-                    color       = cell.color,
-                    north       = cell.north,
-                    east        = cell.east,
-                    south       = cell.south,
-                    west        = cell.west,
-                    isEntrance  = cell.isEntrance,
-                    isColorField= true,    // <-- wieder aktivieren
-                    priority    = cell.priority,
-                    isBlocked   = cell.isBlocked
-                )
-                println("Zelle $coords mit Farbe $c wieder als isColorField=true aktiviert.")
-            }
-        }
-        println("Alle R/G/B-Zellen wurden reaktiviert, du kannst F erneut verwenden.")
-    }
-
-
-
+    /**
+     * Reaktiviert alle R/G/B-Zellen, die als nicht Farbfelder markiert sind.
+     * Diese Methode sollte in der `MainGUI`-Klasse liegen, nicht in `MapState`.
+     * Daher entfernen wir diese Methode hier und behalten sie nur in `MainGUI.kt`.
+     */
+    // Entfernt: resetColorFields(mapState: MapState, mapController: MapController)
 
 }

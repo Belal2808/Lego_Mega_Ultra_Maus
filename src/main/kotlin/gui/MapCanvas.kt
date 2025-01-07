@@ -1,19 +1,29 @@
+package de.fhkiel.rob.legoosctester.gui
+
 import de.fhkiel.rob.labyrinth.gui.MapState
 import de.fhkiel.rob.legoosctester.Cell
 import de.fhkiel.rob.legoosctester.CellBoarder
-import de.fhkiel.rob.legoosctester.Direction
+import de.fhkiel.rob.legoosctester.RoboterDirection
 import java.awt.Color
 import java.awt.Graphics
 import javax.swing.JPanel
 
 class MapCanvas : JPanel() {
-    private val mapState = MapState() // Zustand der Karte
-    var robotDirection: Direction = Direction.NORTH // Aktuelle Richtung des Roboters
-    var robotPosition: Pair<Int, Int>? = null       // Aktuelle Position des Roboters
 
+    private val mapState = MapState() // Zustand der Karte
+
+    // Roboter-Richtung: RoboterDirection statt Direction
+    var robotDirection: RoboterDirection = RoboterDirection.NORTH
+
+    // Aktuelle Position des Roboters
+    var robotPosition: Pair<Int, Int>? = null
+
+    /**
+     * Fügt eine Zelle hinzu und aktualisiert die Anzeige.
+     */
     fun addCell(x: Int, y: Int, cell: Cell) {
         mapState.addCell(x, y, cell)
-        repaint() // Zeichne die Karte neu
+        repaint()
     }
 
     override fun paintComponent(g: Graphics) {
@@ -22,92 +32,91 @@ class MapCanvas : JPanel() {
         val cellSize = 50
         val wallThickness = 5
 
-        // --- Zeichne jede Zelle ---
+        // Zeichne jede Zelle
         for ((position, cell) in mapState.getCells()) {
-            val (x, y) = position
-            val px = x * cellSize
-            val py = y * cellSize
+            val (cx, cy) = position
+            val px = cx * cellSize
+            val py = cy * cellSize
 
             // 1) Zellenfarbe
             g.color = cell.color
             g.fillRect(px, py, cellSize, cellSize)
 
-            // 2) Wände
+            // 2) Walls anhand der borders-Map:
+            //    cell.getBorder(RoboterDirection.NORTH) / .EAST / .SOUTH / .WEST
             g.color = Color.BLACK
-            if (cell.north == CellBoarder.WALL) {
+
+            // NORTH
+            if (cell.getBorder(RoboterDirection.NORTH) == CellBoarder.WALL) {
                 g.fillRect(px, py, cellSize, wallThickness)
             }
-            if (cell.south == CellBoarder.WALL) {
+            // SOUTH
+            if (cell.getBorder(RoboterDirection.SOUTH) == CellBoarder.WALL) {
                 g.fillRect(px, py + cellSize - wallThickness, cellSize, wallThickness)
             }
-            if (cell.west == CellBoarder.WALL) {
+            // WEST
+            if (cell.getBorder(RoboterDirection.WEST) == CellBoarder.WALL) {
                 g.fillRect(px, py, wallThickness, cellSize)
             }
-            if (cell.east == CellBoarder.WALL) {
+            // EAST
+            if (cell.getBorder(RoboterDirection.EAST) == CellBoarder.WALL) {
                 g.fillRect(px + cellSize - wallThickness, py, wallThickness, cellSize)
             }
 
-            // 3) Eingang (E)
+            // 3) Eingang? (gelber Rahmen)
             if (cell.isEntrance) {
                 g.color = Color.YELLOW
                 g.drawRect(px + 5, py + 5, cellSize - 10, cellSize - 10)
             }
 
-            // 4) Blockierte Zellen (X)
+            // 4) Blockiert? (rotes X)
             if (cell.isBlocked) {
                 g.color = Color.RED
-                g.drawLine(px, py, px + cellSize, py + cellSize)  // Diagonale 1
-                g.drawLine(px, py + cellSize, px + cellSize, py)  // Diagonale 2
-                g.drawString("X", px + cellSize / 4, py + 3 * cellSize / 4)
+                // Diagonalen
+                g.drawLine(px, py, px + cellSize, py + cellSize)
+                g.drawLine(px, py + cellSize, px + cellSize, py)
+                g.drawString("X", px + cellSize / 4, py + (3 * cellSize / 4))
             }
         }
 
-        // --- Zeichne den Roboter ---
+        // Zeichne den Roboter
         robotPosition?.let { (rx, ry) ->
             val px = rx * cellSize + cellSize / 2
             val py = ry * cellSize + cellSize / 2
             val size = cellSize / 3
 
             g.color = Color.MAGENTA
-
-            // NEU: Errechne je nach robotDirection die Eckpunkte des Dreiecks
             val (xPoints, yPoints) = getRobotTrianglePoints(px, py, size, robotDirection)
-
             g.fillPolygon(xPoints, yPoints, 3)
         }
     }
 
     /**
-     * Hilfsfunktion zum Ermitteln der Eckpunkte des Roboter-Dreiecks
-     * abhängig von der aktuellen Richtung.
+     * Bestimmt die Eckpunkte des Roboter-Dreiecks in Abhängigkeit von RoboterDirection.
      */
     private fun getRobotTrianglePoints(
         centerX: Int,
         centerY: Int,
         size: Int,
-        direction: Direction
+        direction: RoboterDirection
     ): Pair<IntArray, IntArray> {
         return when (direction) {
-            Direction.NORTH -> {
-                // Spitze nach oben
+            RoboterDirection.NORTH -> {
                 val xPoints = intArrayOf(centerX, centerX - size, centerX + size)
                 val yPoints = intArrayOf(centerY - size, centerY + size, centerY + size)
                 Pair(xPoints, yPoints)
             }
-            Direction.SOUTH -> {
-                // Spitze nach unten
+            RoboterDirection.SOUTH -> {
                 val xPoints = intArrayOf(centerX, centerX - size, centerX + size)
                 val yPoints = intArrayOf(centerY + size, centerY - size, centerY - size)
                 Pair(xPoints, yPoints)
             }
-            Direction.EAST -> {
-                // Spitze nach rechts
+            RoboterDirection.EAST -> {
                 val xPoints = intArrayOf(centerX + size, centerX - size, centerX - size)
                 val yPoints = intArrayOf(centerY, centerY - size, centerY + size)
                 Pair(xPoints, yPoints)
             }
-            Direction.WEST -> {
-                // Spitze nach links
+            RoboterDirection.WEST -> {
                 val xPoints = intArrayOf(centerX - size, centerX + size, centerX + size)
                 val yPoints = intArrayOf(centerY, centerY - size, centerY + size)
                 Pair(xPoints, yPoints)
@@ -115,14 +124,14 @@ class MapCanvas : JPanel() {
         }
     }
 
-    // Aktualisiert nur die Richtung, repaint() ruft paintComponent() neu auf
-    fun updateRobotDirection(direction: Direction) {
+    // Aktualisiert die Richtung
+    fun updateRobotDirection(direction: RoboterDirection) {
         robotDirection = direction
         println("Aktuelle Richtung des Roboters: $robotDirection")
         repaint()
     }
 
-    // Aktualisiert die Position des Roboters und zeichnet neu
+    // Aktualisiert die Roboterposition
     fun updateRobotPosition(x: Int, y: Int) {
         robotPosition = Pair(x, y)
         println("Aktuelle Position des Roboters: $robotPosition")

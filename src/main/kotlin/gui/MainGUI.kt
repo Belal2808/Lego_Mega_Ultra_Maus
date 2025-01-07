@@ -1,12 +1,7 @@
 package de.fhkiel.rob.legoosctester.gui
 
-import MapCanvas
 import de.fhkiel.rob.labyrinth.gui.MapState
-import de.fhkiel.rob.legoosctester.Cell
-import de.fhkiel.rob.legoosctester.CellBoarder
-import de.fhkiel.rob.legoosctester.Direction
-import org.json.JSONArray
-import org.json.JSONObject
+import de.fhkiel.rob.legoosctester.*
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.KeyEvent
@@ -15,18 +10,17 @@ import java.io.File
 import java.io.IOException
 import javax.swing.JFrame
 import javax.swing.Timer
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
+import org.json.*
 
 class MainGUI : JFrame() {
     private var x = 0
     private var y = 0
     private var currentColor = Color.LIGHT_GRAY
-    private var currentDirection = Direction.NORTH
+    private var currentDirection = RoboterDirection.NORTH  // Verwende RoboterDirection
 
+    // MapCanvas liegt im selben Package (ggf. anpassen!)
     val mapCanvas = MapCanvas()
 
-    // 1) Timer + aktueller Pfad
     private var movementTimer: Timer? = null
     private var currentPath: MutableList<Pair<Int, Int>> = mutableListOf()
 
@@ -43,195 +37,212 @@ class MainGUI : JFrame() {
         addKeyListener(object : KeyListener {
             override fun keyPressed(e: KeyEvent) {
                 when (e.keyCode) {
+                    // M => R/G/B-Farben wiederherstellen
                     KeyEvent.VK_M -> {
                         resetColorFields(mapState, mapController)
                     }
 
+                    // WASD => Bewegung
                     KeyEvent.VK_W -> {
-                        y-- // Bewegung nach oben
-                        mapCanvas.updateRobotDirection(Direction.NORTH)
+                        y--
+                        mapCanvas.updateRobotDirection(RoboterDirection.NORTH)
                     }
                     KeyEvent.VK_S -> {
-                        y++ // Bewegung nach unten
-                        mapCanvas.updateRobotDirection(Direction.SOUTH)
+                        y++
+                        mapCanvas.updateRobotDirection(RoboterDirection.SOUTH)
                     }
                     KeyEvent.VK_A -> {
-                        x-- // Bewegung nach links
-                        mapCanvas.updateRobotDirection(Direction.WEST)
+                        x--
+                        mapCanvas.updateRobotDirection(RoboterDirection.WEST)
                     }
                     KeyEvent.VK_D -> {
-                        x++ // Bewegung nach rechts
-                        mapCanvas.updateRobotDirection(Direction.EAST)
+                        x++
+                        mapCanvas.updateRobotDirection(RoboterDirection.EAST)
                     }
 
+                    // ENTER => Neue Zelle mit UNDISCOVERED-Borders
                     KeyEvent.VK_ENTER -> {
-                        // Erstelle eine neue Zelle oder aktualisiere die bestehende
+                        val newBorders = mutableMapOf(
+                            RoboterDirection.NORTH to CellBoarder.UNDISCOVERED,
+                            RoboterDirection.EAST  to CellBoarder.UNDISCOVERED,
+                            RoboterDirection.SOUTH to CellBoarder.UNDISCOVERED,
+                            RoboterDirection.WEST  to CellBoarder.UNDISCOVERED
+                        )
                         mapController.addSimulatedCell(
                             x, y,
                             color = currentColor,
-                            north = CellBoarder.UNDISCOVERED,
-                            east = CellBoarder.UNDISCOVERED,
-                            south = CellBoarder.UNDISCOVERED,
-                            west = CellBoarder.UNDISCOVERED
+                            bordersMap = newBorders
                         )
                         println("Zelle erstellt bei ($x, $y)")
                     }
 
+                    // SPACE => Wand in currentDirection
                     KeyEvent.VK_SPACE -> {
-                        // Aktualisiere die Wand basierend auf der aktuellen Richtung
-                        val cell = mapState.getCells()[Pair(x, y)] ?: Cell(
-                            north = CellBoarder.UNDISCOVERED,
-                            east = CellBoarder.UNDISCOVERED,
-                            south = CellBoarder.UNDISCOVERED,
-                            west = CellBoarder.UNDISCOVERED,
-                            color = currentColor
-                        )
+                        val oldCell = mapState.getCell(x, y) ?: Cell()
 
-                        val updatedCell = when (currentDirection) {
-                            Direction.NORTH -> cell.copy(north = CellBoarder.WALL)
-                            Direction.SOUTH -> cell.copy(south = CellBoarder.WALL)
-                            Direction.WEST -> cell.copy(west = CellBoarder.WALL)
-                            Direction.EAST -> cell.copy(east = CellBoarder.WALL)
-                        }
+                        // Kopiere altes borders
+                        val newBorders = oldCell.borders.toMutableMap()
+                        // Setze in currentDirection => WALL
+                        newBorders[currentDirection] = CellBoarder.WALL
 
                         mapController.addSimulatedCell(
                             x, y,
-                            updatedCell.color,
-                            updatedCell.north,
-                            updatedCell.east,
-                            updatedCell.south,
-                            updatedCell.west
-                        )
-                        println("Wand hinzugefügt bei ($x, $y) in Richtung $currentDirection")
-                    }
-
-                    KeyEvent.VK_N -> {
-                        // 1) Hole alte Zelle oder lege eine Default-Zelle an,
-                        //    damit wir die alten Werte (bes. isColorField) beibehalten können
-                        val oldCell = mapState.getCell(x, y) ?: Cell(
-                            north = CellBoarder.UNDISCOVERED,
-                            east  = CellBoarder.UNDISCOVERED,
-                            south = CellBoarder.UNDISCOVERED,
-                            west  = CellBoarder.UNDISCOVERED,
-                            color = Color.LIGHT_GRAY,
-                            isEntrance   = false,
-                            isColorField = false,
-                            priority     = 0,
-                            isBlocked    = false
-                        )
-
-                        // 2) Färbe nur die Zelle grau, behalte aber isColorField usw.
-                        mapController.addSimulatedCell(
-                            x, y,
-                            color       = Color.LIGHT_GRAY,
-                            north       = oldCell.north,
-                            east        = oldCell.east,
-                            south       = oldCell.south,
-                            west        = oldCell.west,
+                            color       = oldCell.color,
+                            bordersMap  = newBorders,
                             isEntrance  = oldCell.isEntrance,
-                            isColorField= oldCell.isColorField, // <-- beibehalten!
+                            isColorField= oldCell.isColorField,
                             priority    = oldCell.priority,
                             isBlocked   = oldCell.isBlocked
                         )
-                        println("Feld als NONE (grau) markiert, ohne isColorField zu verlieren, bei ($x, $y)")
+                        println("Wand bei ($x, $y) in Richtung $currentDirection")
                     }
 
+                    // N => Grau färben, isColorField behalten
+                    KeyEvent.VK_N -> {
+                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val newBorders = oldCell.borders.toMutableMap()
 
+                        mapController.addSimulatedCell(
+                            x, y,
+                            color = Color.LIGHT_GRAY,
+                            bordersMap = newBorders,
+                            isEntrance  = oldCell.isEntrance,
+                            isColorField= oldCell.isColorField,
+                            priority    = oldCell.priority,
+                            isBlocked   = oldCell.isBlocked
+                        )
+                        println("Zelle bei ($x, $y) auf Grau gesetzt (isColorField bleibt).")
+                    }
 
-
+                    // E => Eingang
                     KeyEvent.VK_E -> {
+                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val newBorders = oldCell.borders.toMutableMap()
+
                         mapController.addSimulatedCell(
                             x, y,
                             color = currentColor,
-                            isEntrance = true
+                            bordersMap = newBorders,
+                            isEntrance = true,
+                            isColorField= oldCell.isColorField,
+                            priority    = oldCell.priority,
+                            isBlocked   = oldCell.isBlocked
                         )
                         println("Eingang gesetzt bei ($x, $y)")
-                        mapCanvas.updateRobotPosition(x, y) // Setzt die Roboterposition
+                        mapCanvas.updateRobotPosition(x, y)
                     }
 
+                    // R/G/B => Farbzellen
                     KeyEvent.VK_R -> {
                         currentColor = Color.RED
                         println("Farbplatte Rot ausgewählt")
+                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val newBorders = oldCell.borders.toMutableMap()
+
                         mapController.addSimulatedCell(
                             x, y,
-                            color = currentColor,
-                            isColorField = true,
-                            priority = 1
+                            color = Color.RED,
+                            bordersMap = newBorders,
+                            isEntrance  = oldCell.isEntrance,
+                            isColorField= true,
+                            priority    = 1,
+                            isBlocked   = oldCell.isBlocked
                         )
                     }
-
                     KeyEvent.VK_G -> {
                         currentColor = Color.GREEN
                         println("Farbplatte Grün ausgewählt")
+                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val newBorders = oldCell.borders.toMutableMap()
+
                         mapController.addSimulatedCell(
                             x, y,
-                            color = currentColor,
-                            isColorField = true,
-                            priority = 2
+                            color = Color.GREEN,
+                            bordersMap = newBorders,
+                            isEntrance  = oldCell.isEntrance,
+                            isColorField= true,
+                            priority    = 2,
+                            isBlocked   = oldCell.isBlocked
                         )
                     }
-
                     KeyEvent.VK_B -> {
                         currentColor = Color.BLUE
                         println("Farbplatte Blau ausgewählt")
+                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val newBorders = oldCell.borders.toMutableMap()
+
                         mapController.addSimulatedCell(
                             x, y,
-                            color = currentColor,
-                            isColorField = true,
-                            priority = 3
+                            color = Color.BLUE,
+                            bordersMap = newBorders,
+                            isEntrance  = oldCell.isEntrance,
+                            isColorField= true,
+                            priority    = 3,
+                            isBlocked   = oldCell.isBlocked
                         )
                     }
 
+                    // X => Blockiert
                     KeyEvent.VK_X -> {
-                        // Markiere die aktuelle Zelle als blockiert
+                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val newBorders = oldCell.borders.toMutableMap()
+
                         mapController.addSimulatedCell(
                             x, y,
                             color = currentColor,
-                            isBlocked = true
+                            bordersMap = newBorders,
+                            isEntrance  = oldCell.isEntrance,
+                            isColorField= oldCell.isColorField,
+                            priority    = oldCell.priority,
+                            isBlocked   = true
                         )
                         println("Blockierte Zelle gesetzt bei ($x, $y)")
                     }
 
+                    // P => Export
                     KeyEvent.VK_P -> {
-                        // Exportiere die Karte in eine Datei
                         try {
                             exportMap(mapState, "labyrinth.json")
                             println("Karte exportiert in labyrinth.json")
-                        } catch (e: IOException) {
-                            println("Fehler beim Export: ${e.message}")
+                        } catch (ex: IOException) {
+                            println("Fehler beim Export: ${ex.message}")
                         }
                     }
 
+                    // L => Load
                     KeyEvent.VK_L -> {
                         loadMap(mapState, "labyrinth.json")
                         println("Karte aus labyrinth.json geladen")
-                        val entrance = mapState.getCells().filterValues { it.isEntrance }.keys.firstOrNull()
-                        entrance?.let { mapCanvas.updateRobotPosition(it.first, it.second) } // Setzt die Roboterposition
+                        val entrance = mapState.getCells()
+                            .filterValues { it.isEntrance }.keys.firstOrNull()
+                        entrance?.let { mapCanvas.updateRobotPosition(it.first, it.second) }
                     }
 
+                    // 1,2,3,4 => Richtung
                     KeyEvent.VK_1 -> {
-                        currentDirection = Direction.NORTH
-                        println("Richtung geändert: Norden")
+                        currentDirection = RoboterDirection.NORTH
+                        println("Richtung: Norden")
                     }
                     KeyEvent.VK_2 -> {
-                        currentDirection = Direction.EAST
-                        println("Richtung geändert: Osten")
+                        currentDirection = RoboterDirection.EAST
+                        println("Richtung: Osten")
                     }
                     KeyEvent.VK_3 -> {
-                        currentDirection = Direction.SOUTH
-                        println("Richtung geändert: Süden")
+                        currentDirection = RoboterDirection.SOUTH
+                        println("Richtung: Süden")
                     }
                     KeyEvent.VK_4 -> {
-                        currentDirection = Direction.WEST
-                        println("Richtung geändert: Westen")
+                        currentDirection = RoboterDirection.WEST
+                        println("Richtung: Westen")
                     }
+
+                    // F => Pfad suchen
                     KeyEvent.VK_F -> {
-                        // Taste F: Pfad suchen + automatisch zum Ziel fahren
                         calculateAndMoveToNextTarget(mapState, mapController)
                     }
                 }
 
-                // Aktualisiere die Roboterposition (manuell durch WASD)
+                // Position updaten
                 mapCanvas.updateRobotPosition(x, y)
                 println("Position: ($x, $y), Farbe: $currentColor, Richtung: $currentDirection")
             }
@@ -242,7 +253,6 @@ class MainGUI : JFrame() {
 
         isVisible = true
     }
-
     // --------------------------------------------------------
     // Export/Load
     // --------------------------------------------------------
@@ -254,10 +264,14 @@ class MainGUI : JFrame() {
             val cellJson = JSONObject()
             cellJson.put("x", coords.first)
             cellJson.put("y", coords.second)
-            cellJson.put("north", cell.north.name)
-            cellJson.put("east", cell.east.name)
-            cellJson.put("south", cell.south.name)
-            cellJson.put("west", cell.west.name)
+
+            // Borders
+            val bordersObj = JSONObject()
+            for ((dir, border) in cell.borders) {
+                bordersObj.put(dir.name, border.name)
+            }
+            cellJson.put("borders", bordersObj)
+
             cellJson.put("color", String.format("#%06X", 0xFFFFFF and cell.color.rgb))
             cellJson.put("isEntrance", cell.isEntrance)
             cellJson.put("isColorField", cell.isColorField)
@@ -266,7 +280,7 @@ class MainGUI : JFrame() {
             jsonArray.put(cellJson)
         }
 
-        file.writeText(jsonArray.toString(4)) // Formatierte Ausgabe
+        file.writeText(jsonArray.toString(4))
     }
 
     private fun loadMap(mapState: MapState, filename: String) {
@@ -280,50 +294,53 @@ class MainGUI : JFrame() {
             val cellJson = jsonArray.getJSONObject(i)
             val x = cellJson.getInt("x")
             val y = cellJson.getInt("y")
-            val cell = Cell(
-                north = CellBoarder.valueOf(cellJson.getString("north")),
-                east = CellBoarder.valueOf(cellJson.getString("east")),
-                south = CellBoarder.valueOf(cellJson.getString("south")),
-                west = CellBoarder.valueOf(cellJson.getString("west")),
-                color = Color.decode(cellJson.getString("color")),
-                isEntrance = cellJson.getBoolean("isEntrance"),
-                isColorField = cellJson.getBoolean("isColorField"),
-                priority = cellJson.getInt("priority"),
-                isBlocked = cellJson.getBoolean("isBlocked")
+
+            val bordersJson = cellJson.getJSONObject("borders")
+            val bordersMap = mutableMapOf<RoboterDirection, CellBoarder>()
+            for (dirName in bordersJson.keySet()) {
+                val borderName = bordersJson.getString(dirName)
+                val borderEnum = CellBoarder.valueOf(borderName)
+                val dirEnum = RoboterDirection.valueOf(dirName)
+                bordersMap[dirEnum] = borderEnum
+            }
+
+            val colorStr = cellJson.getString("color")
+            val colorParsed = Color.decode(colorStr)
+
+            val isEntrance   = cellJson.getBoolean("isEntrance")
+            val isColorField = cellJson.getBoolean("isColorField")
+            val priority     = cellJson.getInt("priority")
+            val isBlocked    = cellJson.getBoolean("isBlocked")
+
+            val newCell = Cell(
+                borders = bordersMap,
+                color = colorParsed,
+                isEntrance = isEntrance,
+                isColorField = isColorField,
+                priority = priority,
+                isBlocked = isBlocked
             )
-            cellsMap[Pair(x, y)] = cell
+            cellsMap[Pair(x, y)] = newCell
         }
 
-        // Aktualisiere die Darstellung der geladenen Zellen
+        // Aktualisiere die Anzeige
         cellsMap.forEach { (coords, cell) ->
             mapCanvas.addCell(coords.first, coords.second, cell)
         }
-
-        mapCanvas.repaint() // Stelle sicher, dass die GUI neu gezeichnet wird
+        mapCanvas.repaint()
     }
 
     // --------------------------------------------------------
     // Pfadberechnung + Automatische Bewegung
     // --------------------------------------------------------
-
-    /**
-     * Sucht den nächsten Pfad und markiert ihn.
-     * Startet außerdem einen Timer, der den Roboter automatisch Schritt für Schritt bewegt.
-     */
     private fun calculateAndMoveToNextTarget(mapState: MapState, mapController: MapController) {
-        val currentPosition = mapCanvas.robotPosition
-
-        if (currentPosition == null) {
+        val currentPosition = mapCanvas.robotPosition ?: run {
             println("Fehler: Roboterposition ist nicht definiert!")
             return
         }
-
         println("Aktueller Startpunkt: $currentPosition")
 
-        // (A) Liste aller Farbzellen:
-        val targets = mapState.getCells()
-            .filterValues { it.isColorField }
-            .keys
+        val targets = mapState.getCells().filterValues { it.isColorField }.keys
         println("Aktuelle Farbziele: $targets")
 
         if (targets.isEmpty()) {
@@ -332,64 +349,88 @@ class MainGUI : JFrame() {
             return
         }
 
-        // (B) Wähle nächstes Ziel
         val nextTarget = targets.minByOrNull { target ->
             val path = mapState.findPathDijkstra(currentPosition, target)
             if (path.isNotEmpty()) path.size else Int.MAX_VALUE
         }
-
         if (nextTarget == null) {
             println("Kein gültiger Pfad zu einer Farbzelle gefunden.")
             removeCyanPath(mapState, mapController)
             return
         }
 
-        // *** NEU: Wenn das Ziel == currentPosition => isColorField deaktivieren und Abbruch ***
         if (nextTarget == currentPosition) {
-            println("Nächstes Ziel ist gleich aktueller Standort: $nextTarget.")
+            println("Nächstes Ziel == aktueller Standort: $currentPosition. Deaktiviere isColorField.")
             val cellHere = mapState.getCell(currentPosition.first, currentPosition.second)
             if (cellHere != null && cellHere.isColorField) {
-                println("Deaktiviere isColorField bei $currentPosition, um Endlosschleifen zu vermeiden.")
+                // isColorField deaktivieren
+                val updated = cellHere.copy(isColorField = false)
+
+                // Borders-Map unverändert übernehmen
+                val newBorders = updated.borders.toMutableMap()
+
                 mapController.addSimulatedCell(
-                    currentPosition.first, currentPosition.second,
-                    color       = cellHere.color,
-                    north       = cellHere.north,
-                    east        = cellHere.east,
-                    south       = cellHere.south,
-                    west        = cellHere.west,
-                    isEntrance  = cellHere.isEntrance,
-                    isColorField= false, // --> Ziel nicht mehr Farb-Zelle
-                    priority    = cellHere.priority,
-                    isBlocked   = cellHere.isBlocked
+                    x = currentPosition.first,
+                    y = currentPosition.second,
+                    color      = updated.color,
+                    bordersMap = newBorders,
+                    isEntrance = updated.isEntrance,
+                    isColorField = false,
+                    priority   = updated.priority,
+                    isBlocked  = updated.isBlocked
                 )
             }
             return
         }
 
-        // (C) Dijkstra zum gewählten Ziel
         val path = mapState.findPathDijkstra(currentPosition, nextTarget)
         if (path.isEmpty()) {
-            println("Kein gültiger Pfad zum Ziel gefunden (Blockaden, Wände oder fehlender Boden).")
+            println("Kein gültiger Pfad zum Ziel gefunden.")
             removeCyanPath(mapState, mapController)
             return
         }
 
-        println("Berechneter Pfad zur nächsten Farbzelle: $path")
-
-        // Alte Pfadmarkierungen entfernen
+        println("Berechneter Pfad: $path")
         removeCyanPath(mapState, mapController)
 
-        // Neuen Pfad auf CYAN setzen
-        path.forEach { (px, py) ->
-            val cell = mapState.getCell(px, py)
-            if (cell != null && !cell.isBlocked && cell.color == Color.LIGHT_GRAY) {
+        // Markiere Pfad als CYAN
+        for ((px, py) in path) {
+            val oldCell = mapState.getCell(px, py) ?: Cell()
+            if (!oldCell.isBlocked && oldCell.color == Color.LIGHT_GRAY) {
+                val newBorders = oldCell.borders.toMutableMap()
+
                 mapController.addSimulatedCell(
-                    px, py,
+                    x = px,
+                    y = py,
                     color = Color.CYAN,
-                    north = cell.north,
-                    east  = cell.east,
-                    south = cell.south,
-                    west  = cell.west,
+                    bordersMap = newBorders,
+                    isEntrance  = oldCell.isEntrance,
+                    isColorField= oldCell.isColorField,
+                    priority    = oldCell.priority,
+                    isBlocked   = oldCell.isBlocked
+                )
+            }
+        }
+        mapCanvas.repaint()
+        println("Pfad erfolgreich markiert.")
+
+        movementTimer?.stop()
+        currentPath = path.toMutableList()
+
+        movementTimer = Timer(500) {
+            moveRobotOneStep(mapState, mapController)
+        }
+        movementTimer?.start()
+    }
+
+    private fun removeCyanPath(mapState: MapState, mapController: MapController) {
+        for ((coords, cell) in mapState.getCells()) {
+            if (cell.color == Color.CYAN) {
+                val newBorders = cell.borders.toMutableMap()  // unverändert
+                mapController.addSimulatedCell(
+                    coords.first, coords.second,
+                    color = Color.LIGHT_GRAY,
+                    bordersMap = newBorders,
                     isEntrance  = cell.isEntrance,
                     isColorField= cell.isColorField,
                     priority    = cell.priority,
@@ -397,134 +438,81 @@ class MainGUI : JFrame() {
                 )
             }
         }
-        mapCanvas.repaint()
-        println("Pfad erfolgreich markiert.")
-
-        // Timer anhalten (falls noch einer läuft)
-        movementTimer?.stop()
-
-        // Pfad übernehmen
-        currentPath = path.toMutableList()
-
-        // Neuen Timer starten
-        movementTimer = Timer(500) {
-            moveRobotOneStep(mapState, mapController)
-        }
-        movementTimer?.start()
     }
 
-    /**
-     * Löscht sämtliche CYAN-Zellen (alte Pfadmarkierungen), indem sie wieder auf LIGHT_GRAY gesetzt werden.
-     */
-    private fun removeCyanPath(mapState: MapState, mapController: MapController) {
-        mapState.getCells().forEach { (coords, cell) ->
-            if (cell.color == Color.CYAN) {
-                mapController.addSimulatedCell(
-                    coords.first, coords.second,
-                    color = Color.LIGHT_GRAY,
-                    north = cell.north,
-                    east = cell.east,
-                    south = cell.south,
-                    west = cell.west,
-                    isEntrance = cell.isEntrance,
-                    isColorField = cell.isColorField,
-                    priority = cell.priority,
-                    isBlocked = cell.isBlocked
-                )
-            }
-        }
-    }
 
-    /**
-     * Bewegt den Roboter einen Schritt entlang des aktuellen Pfads (currentPath).
-     * Wenn der Pfad abgefahren ist, beendet den Timer und prüft, ob wir auf einer Farbzelle stehen.
-     * Falls ja, erneut calculateAndMoveToNextTarget (z.B. für das nächste Farbziel).
-     */
     private fun moveRobotOneStep(mapState: MapState, mapController: MapController) {
-        // 1) Keine Schritte mehr übrig => Wir haben das aktuelle Ziel erreicht
         if (currentPath.isEmpty()) {
             println("Pfad vollständig abgefahren. Stoppe Bewegung.")
             movementTimer?.stop()
 
             val pos = mapCanvas.robotPosition
             if (pos != null) {
-                // Hole die Zell-Daten
                 val cell = mapState.getCell(pos.first, pos.second)
-                // Prüfen: Ist es (noch) Farbzelle?
                 if (cell != null && cell.isColorField) {
                     println("Farbziel erreicht bei $pos.")
+                    // isColorField = false
+                    val updatedCell = cell.copy(isColorField = false)
+                    val newBorders  = updatedCell.borders.toMutableMap()
 
-                    // Mit der NEUEN addSimulatedCell(...) => isColorField = false
                     mapController.addSimulatedCell(
                         x = pos.first,
                         y = pos.second,
-                        color       = cell.color,
-                        north       = cell.north,
-                        east        = cell.east,
-                        south       = cell.south,
-                        west        = cell.west,
-                        isEntrance  = cell.isEntrance,
-                        isColorField= false,  // <-- Deaktivieren
-                        priority    = cell.priority,
-                        isBlocked   = cell.isBlocked
+                        color      = updatedCell.color,
+                        bordersMap = newBorders,
+                        isEntrance = updatedCell.isEntrance,
+                        isColorField = false,
+                        priority   = updatedCell.priority,
+                        isBlocked  = updatedCell.isBlocked
                     )
 
-                    // => Starte sofort das nächste Ziel
+                    // Nächstes Ziel
                     calculateAndMoveToNextTarget(mapState, mapController)
                 }
             }
             return
         }
 
-        // 2) Wir haben noch Schritte übrig => bewege den Roboter ein Feld weiter
         val nextCoord = currentPath.removeAt(0)
         println("Bewege Roboter zu: $nextCoord")
 
-        // Richtung automatisch setzen
         val oldPos = mapCanvas.robotPosition
         if (oldPos != null) {
             val dx = nextCoord.first - oldPos.first
             val dy = nextCoord.second - oldPos.second
             val newDirection = when {
-                dx > 0 -> Direction.EAST
-                dx < 0 -> Direction.WEST
-                dy > 0 -> Direction.SOUTH
-                else   -> Direction.NORTH
+                dx > 0 -> RoboterDirection.EAST
+                dx < 0 -> RoboterDirection.WEST
+                dy > 0 -> RoboterDirection.SOUTH
+                else   -> RoboterDirection.NORTH
             }
             mapCanvas.updateRobotDirection(newDirection)
         }
 
-        // Roboter verschieben
         mapCanvas.updateRobotPosition(nextCoord.first, nextCoord.second)
     }
 
+
     private fun resetColorFields(mapState: MapState, mapController: MapController) {
-        // Durchlaufe alle Zellen
         for ((coords, cell) in mapState.getCells()) {
-            // Prüfe, ob die Farbe (rot, grün oder blau) ist
-            // und ob isColorField = false ist (abgefahren)
             val c = cell.color
             val isRGB = (c == Color.RED || c == Color.GREEN || c == Color.BLUE)
-
             if (isRGB && !cell.isColorField) {
-                // Reaktiviere diese Zelle
+                val newBorders = cell.borders.toMutableMap()
+
                 mapController.addSimulatedCell(
                     coords.first, coords.second,
-                    // Farbe bleibt die gleiche
-                    color       = cell.color,
-                    north       = cell.north,
-                    east        = cell.east,
-                    south       = cell.south,
-                    west        = cell.west,
+                    color = cell.color,
+                    bordersMap = newBorders,
                     isEntrance  = cell.isEntrance,
-                    isColorField= true,    // <-- wieder aktivieren
+                    isColorField= true,
                     priority    = cell.priority,
                     isBlocked   = cell.isBlocked
                 )
                 println("Zelle $coords mit Farbe $c wieder als isColorField=true aktiviert.")
             }
         }
-        println("Alle R/G/B-Zellen wurden reaktiviert, du kannst F erneut verwenden.")
+        println("Alle R/G/B-Zellen reaktiviert, du kannst F erneut verwenden.")
     }
-
 }
+
