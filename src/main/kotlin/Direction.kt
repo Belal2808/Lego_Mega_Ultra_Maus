@@ -5,6 +5,12 @@ enum class RoboterDirection(val value: Int) {
     EAST(1),
     SOUTH(2),
     WEST(3);
+    companion object {
+
+        fun fromValue(value: Int): RoboterDirection {
+            return RoboterDirection.entries.find { it.value == value }!!
+        }
+    }
 }
 
 enum class EyesDirection(val value: Int){

@@ -10,8 +10,8 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
         TODO("Not yet implemented")
     }
 
-    override fun getCell(x: Int, y: Int): Cell {
-        TODO("Not yet implemented")
+    override fun getCell(position: Pair<Int, Int>): Cell? {
+            return labyrinth[position.first][position.second]
     }
 
     override fun getRobotPosition(): Pair<Int, Int> {

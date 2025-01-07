@@ -13,6 +13,11 @@ data class Cell(
     fun setBorder(direction: RoboterDirection, border: CellBoarder) {
         borders[direction] = border
     }
+
+    fun getUndiscoveredBorders(): List<RoboterDirection> {
+        return borders.filter { it.value == CellBoarder.UNDISCOVERED }
+            .map { it.key }
+    }
 }
 
 enum class CellBoarder{

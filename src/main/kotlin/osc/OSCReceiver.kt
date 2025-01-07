@@ -3,7 +3,9 @@ package de.fhkiel.rob.legoosctester.osc
 import com.illposed.osc.MessageSelector
 import com.illposed.osc.OSCMessageEvent
 import com.illposed.osc.transport.OSCPortIn
+import de.fhkiel.rob.legoosctester.RobotStateService
 import de.fhkiel.rob.legoosctester.gui.Incoming.log
+import org.koin.mp.KoinPlatform.getKoin
 import kotlin.concurrent.thread
 
 object OSCReceiver {
@@ -11,9 +13,11 @@ object OSCReceiver {
         private set
     private lateinit var receiver: OSCPortIn
 
+    private val roboterState : RobotStateService = getKoin().get()
+
     private val listeners = mutableListOf<(String, List<Any>) -> Unit>()
 
-    var prefixFilter: String = "/OSCBrick@192.168.178.152"
+    var prefixFilter: String = "/OSCBrick@${roboterState.robotIp}"
 
     fun addListener(listener: (String, List<Any>) -> Unit) {
         listeners.add(listener)

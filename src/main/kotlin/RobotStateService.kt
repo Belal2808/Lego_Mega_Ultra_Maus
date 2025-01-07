@@ -13,4 +13,5 @@ interface RobotStateService {
     fun setRoboterDirection(direction: RoboterDirection)
     fun setEyesDirection(direction: EyesDirection)
     fun getEyesDirection(): EyesDirection
+    fun getBackwardsDirection(): RoboterDirection
 }
