@@ -30,7 +30,8 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
     }
 
     fun scanCell() {
-       var currentCell = labyrinthStateService.getCell(labyrinthStateService.getRobotPosition())
+        val position = labyrinthStateService.getRobotPosition()
+       var currentCell = labyrinthStateService.getCell(position.first,position.second)
         if(currentCell == null){
             currentCell = Cell()
         }
@@ -46,9 +47,5 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
             }
         }
         movementPlanner.resetEyes()
-    }
-    fun printCellBoarders(){
-        val currentCell = labyrinthStateService.getCell(labyrinthStateService.getRobotPosition())
-        print(currentCell!!.borders.toString())
     }
 }

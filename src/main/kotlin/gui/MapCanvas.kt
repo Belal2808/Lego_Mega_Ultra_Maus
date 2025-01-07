@@ -1,28 +1,23 @@
 package de.fhkiel.rob.legoosctester.gui
 
-import de.fhkiel.rob.labyrinth.gui.MapState
 import de.fhkiel.rob.legoosctester.Cell
 import de.fhkiel.rob.legoosctester.CellBoarder
+import de.fhkiel.rob.legoosctester.LabyrinthStateService
 import de.fhkiel.rob.legoosctester.RoboterDirection
+import org.koin.mp.KoinPlatform.getKoin
 import java.awt.Color
 import java.awt.Graphics
 import javax.swing.JPanel
 
 class MapCanvas : JPanel() {
 
-    private val mapState = MapState() // Zustand der Karte
-
-    // Roboter-Richtung: RoboterDirection statt Direction
-    var robotDirection: RoboterDirection = RoboterDirection.NORTH
-
-    // Aktuelle Position des Roboters
-    var robotPosition: Pair<Int, Int>? = null
+    private val labyrinthState: LabyrinthStateService = getKoin().get()// Zustand der Karte
 
     /**
      * Fügt eine Zelle hinzu und aktualisiert die Anzeige.
      */
     fun addCell(x: Int, y: Int, cell: Cell) {
-        mapState.addCell(x, y, cell)
+        labyrinthState.addCell(x, y, cell)
         repaint()
     }
 
@@ -33,7 +28,7 @@ class MapCanvas : JPanel() {
         val wallThickness = 5
 
         // Zeichne jede Zelle
-        for ((position, cell) in mapState.getCells()) {
+        for ((position, cell) in labyrinthState.getCells()) {
             val (cx, cy) = position
             val px = cx * cellSize
             val py = cy * cellSize
@@ -80,13 +75,13 @@ class MapCanvas : JPanel() {
         }
 
         // Zeichne den Roboter
-        robotPosition?.let { (rx, ry) ->
+        labyrinthState.getRobotPosition().let { (rx, ry) ->
             val px = rx * cellSize + cellSize / 2
             val py = ry * cellSize + cellSize / 2
             val size = cellSize / 3
 
             g.color = Color.MAGENTA
-            val (xPoints, yPoints) = getRobotTrianglePoints(px, py, size, robotDirection)
+            val (xPoints, yPoints) = getRobotTrianglePoints(px, py, size, RoboterDirection.NORTH) //To do
             g.fillPolygon(xPoints, yPoints, 3)
         }
     }
@@ -126,15 +121,15 @@ class MapCanvas : JPanel() {
 
     // Aktualisiert die Richtung
     fun updateRobotDirection(direction: RoboterDirection) {
-        robotDirection = direction
-        println("Aktuelle Richtung des Roboters: $robotDirection")
+        //robotDirection = direction
+        //println("Aktuelle Richtung des Roboters: $robotDirection")
         repaint()
     }
 
     // Aktualisiert die Roboterposition
     fun updateRobotPosition(x: Int, y: Int) {
-        robotPosition = Pair(x, y)
-        println("Aktuelle Position des Roboters: $robotPosition")
+        labyrinthState.setRobotPosition(x,y)
+        println("Aktuelle Position des Roboters: $x, $y")
         repaint()
     }
 }

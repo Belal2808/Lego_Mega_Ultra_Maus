@@ -1,11 +1,10 @@
 package de.fhkiel.rob.legoosctester.gui
 
-import de.fhkiel.rob.labyrinth.gui.MapState
 import de.fhkiel.rob.legoosctester.*
 import java.awt.Color
 
 class MapController(
-    private val mapState: MapState,
+    private val labyrinthState: LabyrinthStateService,
     private val mapCanvas: MapCanvas
 ) {
 
@@ -29,7 +28,7 @@ class MapController(
         priority: Int? = null,
         isBlocked: Boolean? = null
     ) {
-        val existingCell = mapState.getCell(x, y)
+        val existingCell = labyrinthState.getCell(x, y)
         println("Vorherige Zelle an Position ($x, $y): $existingCell")
 
         // Wenn keine alte Zelle existiert, Standardwerte anlegen
@@ -70,7 +69,7 @@ class MapController(
         println("Neue/aktualisierte Zelle an Position ($x, $y): $newCell")
 
         // In MapState und MapCanvas eintragen
-        mapState.addCell(x, y, newCell)
+        labyrinthState.addCell(x, y, newCell)
         mapCanvas.addCell(x, y, newCell)
         mapCanvas.repaint()
 

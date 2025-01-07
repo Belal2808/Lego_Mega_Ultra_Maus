@@ -127,8 +127,8 @@ class RobotController {
         }else if(path == "/OSCBrick@${roboterState.robotIp}/motor/c/angle/is" && args[0] == 0){
             // do nothing
         }else if(path == "/OSCBrick@${roboterState.robotIp}/ultrasonic/s1/distance/is"){
-
-            val currentCell = labyrinthState.getCell(labyrinthState.getRobotPosition())
+            val currentsPosition = labyrinthState.getRobotPosition()
+            val currentCell = labyrinthState.getCell(currentsPosition.first,currentsPosition.second)
             val list = currentCell?.getUndiscoveredBorders()
 
             if(list!!.isEmpty()){

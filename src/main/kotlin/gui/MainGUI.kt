@@ -1,6 +1,5 @@
 package de.fhkiel.rob.legoosctester.gui
 
-import de.fhkiel.rob.labyrinth.gui.MapState
 import de.fhkiel.rob.legoosctester.*
 import java.awt.Color
 import java.awt.Dimension
@@ -11,10 +10,9 @@ import java.io.IOException
 import javax.swing.JFrame
 import javax.swing.Timer
 import org.json.*
+import org.koin.mp.KoinPlatform.getKoin
 
 class MainGUI : JFrame() {
-    private var x = 0
-    private var y = 0
     private var currentColor = Color.LIGHT_GRAY
     private var currentDirection = RoboterDirection.NORTH  // Verwende RoboterDirection
 
@@ -25,12 +23,13 @@ class MainGUI : JFrame() {
     private var currentPath: MutableList<Pair<Int, Int>> = mutableListOf()
 
     init {
+        val labyrinthExplorer: LabyrinthExplorer = getKoin().get()
         title = "Labyrinth Map"
         size = Dimension(800, 600)
         defaultCloseOperation = EXIT_ON_CLOSE
 
-        val mapState = MapState()
-        val mapController = MapController(mapState, mapCanvas)
+        val labyrinthState: LabyrinthStateService = getKoin().get()
+        val mapController = MapController(labyrinthState, mapCanvas)
 
         add(mapCanvas)
 
@@ -39,26 +38,27 @@ class MainGUI : JFrame() {
                 when (e.keyCode) {
                     // M => R/G/B-Farben wiederherstellen
                     KeyEvent.VK_M -> {
-                        resetColorFields(mapState, mapController)
+                        resetColorFields(labyrinthState, mapController)
                     }
 
                     // WASD => Bewegung
                     KeyEvent.VK_W -> {
-                        y--
+                        labyrinthExplorer.driveNorth()
                         mapCanvas.updateRobotDirection(RoboterDirection.NORTH)
                     }
                     KeyEvent.VK_S -> {
-                        y++
+                        labyrinthExplorer.driveSouth()
                         mapCanvas.updateRobotDirection(RoboterDirection.SOUTH)
                     }
                     KeyEvent.VK_A -> {
-                        x--
+                        labyrinthExplorer.driveWest()
                         mapCanvas.updateRobotDirection(RoboterDirection.WEST)
                     }
                     KeyEvent.VK_D -> {
-                        x++
+                        labyrinthExplorer.driveEast()
                         mapCanvas.updateRobotDirection(RoboterDirection.EAST)
                     }
+
 
                     // ENTER => Neue Zelle mit UNDISCOVERED-Borders
                     KeyEvent.VK_ENTER -> {
@@ -78,7 +78,7 @@ class MainGUI : JFrame() {
 
                     // SPACE => Wand in currentDirection
                     KeyEvent.VK_SPACE -> {
-                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val oldCell = labyrinthState.getCell(x, y) ?: Cell()
 
                         // Kopiere altes borders
                         val newBorders = oldCell.borders.toMutableMap()
@@ -99,7 +99,7 @@ class MainGUI : JFrame() {
 
                     // N => Grau färben, isColorField behalten
                     KeyEvent.VK_N -> {
-                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val oldCell = labyrinthState.getCell(x, y) ?: Cell()
                         val newBorders = oldCell.borders.toMutableMap()
 
                         mapController.addSimulatedCell(
@@ -116,7 +116,7 @@ class MainGUI : JFrame() {
 
                     // E => Eingang
                     KeyEvent.VK_E -> {
-                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val oldCell = labyrinthState.getCell(x, y) ?: Cell()
                         val newBorders = oldCell.borders.toMutableMap()
 
                         mapController.addSimulatedCell(
@@ -136,7 +136,7 @@ class MainGUI : JFrame() {
                     KeyEvent.VK_R -> {
                         currentColor = Color.RED
                         println("Farbplatte Rot ausgewählt")
-                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val oldCell = labyrinthState.getCell(x, y) ?: Cell()
                         val newBorders = oldCell.borders.toMutableMap()
 
                         mapController.addSimulatedCell(
@@ -152,7 +152,7 @@ class MainGUI : JFrame() {
                     KeyEvent.VK_G -> {
                         currentColor = Color.GREEN
                         println("Farbplatte Grün ausgewählt")
-                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val oldCell = labyrinthState.getCell(x, y) ?: Cell()
                         val newBorders = oldCell.borders.toMutableMap()
 
                         mapController.addSimulatedCell(
@@ -168,7 +168,7 @@ class MainGUI : JFrame() {
                     KeyEvent.VK_B -> {
                         currentColor = Color.BLUE
                         println("Farbplatte Blau ausgewählt")
-                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val oldCell = labyrinthState.getCell(x, y) ?: Cell()
                         val newBorders = oldCell.borders.toMutableMap()
 
                         mapController.addSimulatedCell(
@@ -184,7 +184,7 @@ class MainGUI : JFrame() {
 
                     // X => Blockiert
                     KeyEvent.VK_X -> {
-                        val oldCell = mapState.getCell(x, y) ?: Cell()
+                        val oldCell = labyrinthState.getCell(x, y) ?: Cell()
                         val newBorders = oldCell.borders.toMutableMap()
 
                         mapController.addSimulatedCell(
@@ -202,7 +202,7 @@ class MainGUI : JFrame() {
                     // P => Export
                     KeyEvent.VK_P -> {
                         try {
-                            exportMap(mapState, "labyrinth.json")
+                            exportMap(labyrinthState, "labyrinth.json")
                             println("Karte exportiert in labyrinth.json")
                         } catch (ex: IOException) {
                             println("Fehler beim Export: ${ex.message}")
@@ -211,9 +211,9 @@ class MainGUI : JFrame() {
 
                     // L => Load
                     KeyEvent.VK_L -> {
-                        loadMap(mapState, "labyrinth.json")
+                        loadMap(labyrinthState, "labyrinth.json")
                         println("Karte aus labyrinth.json geladen")
-                        val entrance = mapState.getCells()
+                        val entrance = labyrinthState.getCells()
                             .filterValues { it.isEntrance }.keys.firstOrNull()
                         entrance?.let { mapCanvas.updateRobotPosition(it.first, it.second) }
                     }
@@ -238,12 +238,12 @@ class MainGUI : JFrame() {
 
                     // F => Pfad suchen
                     KeyEvent.VK_F -> {
-                        calculateAndMoveToNextTarget(mapState, mapController)
+                        calculateAndMoveToNextTarget(labyrinthState, mapController)
                     }
                 }
 
                 // Position updaten
-                mapCanvas.updateRobotPosition(x, y)
+                mapCanvas.updateRobotPosition(labyrinthState.getRobotPosition().first,labyrinthState.getRobotPosition().second)
                 println("Position: ($x, $y), Farbe: $currentColor, Richtung: $currentDirection")
             }
 
@@ -256,11 +256,11 @@ class MainGUI : JFrame() {
     // --------------------------------------------------------
     // Export/Load
     // --------------------------------------------------------
-    private fun exportMap(mapState: MapState, filename: String) {
+    private fun exportMap(labyrinthState: LabyrinthStateService, filename: String) {
         val file = File(filename)
         val jsonArray = JSONArray()
 
-        mapState.getCells().forEach { (coords, cell) ->
+        labyrinthState.getCells().forEach { (coords, cell) ->
             val cellJson = JSONObject()
             cellJson.put("x", coords.first)
             cellJson.put("y", coords.second)
@@ -283,11 +283,11 @@ class MainGUI : JFrame() {
         file.writeText(jsonArray.toString(4))
     }
 
-    private fun loadMap(mapState: MapState, filename: String) {
+    private fun loadMap(labyrinthState: LabyrinthStateService, filename: String) {
         val file = File(filename)
         val jsonArray = JSONArray(file.readText())
 
-        val cellsMap = mapState.getCells() as MutableMap<Pair<Int, Int>, Cell>
+        val cellsMap = labyrinthState.getCells() as MutableMap<Pair<Int, Int>, Cell>
         cellsMap.clear()
 
         for (i in 0 until jsonArray.length()) {
@@ -333,35 +333,32 @@ class MainGUI : JFrame() {
     // --------------------------------------------------------
     // Pfadberechnung + Automatische Bewegung
     // --------------------------------------------------------
-    private fun calculateAndMoveToNextTarget(mapState: MapState, mapController: MapController) {
-        val currentPosition = mapCanvas.robotPosition ?: run {
-            println("Fehler: Roboterposition ist nicht definiert!")
-            return
-        }
+    private fun calculateAndMoveToNextTarget(labyrinthState: LabyrinthStateService, mapController: MapController) {
+        val currentPosition = labyrinthState.getRobotPosition()
         println("Aktueller Startpunkt: $currentPosition")
 
-        val targets = mapState.getCells().filterValues { it.isColorField }.keys
+        val targets = labyrinthState.getCells().filterValues { it.isColorField }.keys
         println("Aktuelle Farbziele: $targets")
 
         if (targets.isEmpty()) {
             println("Keine Farbzellen verfügbar.")
-            removeCyanPath(mapState, mapController)
+            removeCyanPath(labyrinthState, mapController)
             return
         }
 
         val nextTarget = targets.minByOrNull { target ->
-            val path = mapState.findPathDijkstra(currentPosition, target)
+            val path = labyrinthState.findPathDijkstra(currentPosition, target)
             if (path.isNotEmpty()) path.size else Int.MAX_VALUE
         }
         if (nextTarget == null) {
             println("Kein gültiger Pfad zu einer Farbzelle gefunden.")
-            removeCyanPath(mapState, mapController)
+            removeCyanPath(labyrinthState, mapController)
             return
         }
 
         if (nextTarget == currentPosition) {
             println("Nächstes Ziel == aktueller Standort: $currentPosition. Deaktiviere isColorField.")
-            val cellHere = mapState.getCell(currentPosition.first, currentPosition.second)
+            val cellHere = labyrinthState.getCell(currentPosition.first, currentPosition.second)
             if (cellHere != null && cellHere.isColorField) {
                 // isColorField deaktivieren
                 val updated = cellHere.copy(isColorField = false)
@@ -383,19 +380,19 @@ class MainGUI : JFrame() {
             return
         }
 
-        val path = mapState.findPathDijkstra(currentPosition, nextTarget)
+        val path = labyrinthState.findPathDijkstra(currentPosition, nextTarget)
         if (path.isEmpty()) {
             println("Kein gültiger Pfad zum Ziel gefunden.")
-            removeCyanPath(mapState, mapController)
+            removeCyanPath(labyrinthState, mapController)
             return
         }
 
         println("Berechneter Pfad: $path")
-        removeCyanPath(mapState, mapController)
+        removeCyanPath(labyrinthState, mapController)
 
         // Markiere Pfad als CYAN
         for ((px, py) in path) {
-            val oldCell = mapState.getCell(px, py) ?: Cell()
+            val oldCell = labyrinthState.getCell(px, py) ?: Cell()
             if (!oldCell.isBlocked && oldCell.color == Color.LIGHT_GRAY) {
                 val newBorders = oldCell.borders.toMutableMap()
 
@@ -418,13 +415,13 @@ class MainGUI : JFrame() {
         currentPath = path.toMutableList()
 
         movementTimer = Timer(500) {
-            moveRobotOneStep(mapState, mapController)
+            moveRobotOneStep(labyrinthState, mapController)
         }
         movementTimer?.start()
     }
 
-    private fun removeCyanPath(mapState: MapState, mapController: MapController) {
-        for ((coords, cell) in mapState.getCells()) {
+    private fun removeCyanPath(labyrinthState: LabyrinthStateService, mapController: MapController) {
+        for ((coords, cell) in labyrinthState.getCells()) {
             if (cell.color == Color.CYAN) {
                 val newBorders = cell.borders.toMutableMap()  // unverändert
                 mapController.addSimulatedCell(
@@ -441,14 +438,14 @@ class MainGUI : JFrame() {
     }
 
 
-    private fun moveRobotOneStep(mapState: MapState, mapController: MapController) {
+    private fun moveRobotOneStep(labyrinthState: LabyrinthStateService, mapController: MapController) {
         if (currentPath.isEmpty()) {
             println("Pfad vollständig abgefahren. Stoppe Bewegung.")
             movementTimer?.stop()
 
-            val pos = mapCanvas.robotPosition
+            val pos = labyrinthState.getRobotPosition()
             if (pos != null) {
-                val cell = mapState.getCell(pos.first, pos.second)
+                val cell = labyrinthState.getCell(pos.first, pos.second)
                 if (cell != null && cell.isColorField) {
                     println("Farbziel erreicht bei $pos.")
                     // isColorField = false
@@ -467,7 +464,7 @@ class MainGUI : JFrame() {
                     )
 
                     // Nächstes Ziel
-                    calculateAndMoveToNextTarget(mapState, mapController)
+                    calculateAndMoveToNextTarget(labyrinthState, mapController)
                 }
             }
             return
@@ -476,7 +473,7 @@ class MainGUI : JFrame() {
         val nextCoord = currentPath.removeAt(0)
         println("Bewege Roboter zu: $nextCoord")
 
-        val oldPos = mapCanvas.robotPosition
+        val oldPos = labyrinthState.getRobotPosition()
         if (oldPos != null) {
             val dx = nextCoord.first - oldPos.first
             val dy = nextCoord.second - oldPos.second
@@ -493,8 +490,8 @@ class MainGUI : JFrame() {
     }
 
 
-    private fun resetColorFields(mapState: MapState, mapController: MapController) {
-        for ((coords, cell) in mapState.getCells()) {
+    private fun resetColorFields(labyrinthState: LabyrinthStateService, mapController: MapController) {
+        for ((coords, cell) in labyrinthState.getCells()) {
             val c = cell.color
             val isRGB = (c == Color.RED || c == Color.GREEN || c == Color.BLUE)
             if (isRGB && !cell.isColorField) {
