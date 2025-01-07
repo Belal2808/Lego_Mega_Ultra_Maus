@@ -35,7 +35,9 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
         }
         val undiscoveredBoardersList = currentCell.getUndiscoveredBorders()
         if(undiscoveredBoardersList.isNotEmpty()){
-
+            for(undiscoveredBoarder in undiscoveredBoardersList){
+                movementPlanner.planAndExecuteEyeMovement(undiscoveredBoarder)
+            }
         }
 
 
