@@ -11,28 +11,31 @@ import javax.swing.JFrame
 import javax.swing.JFrame.EXIT_ON_CLOSE
 import javax.swing.JPanel
 
-class TestGui: JFrame() {
+class TestGui: JFrame(
 
+) {
+    private val robotController: RobotController = getKoin().get()
     init {
+        val labyrinthExplorer: LabyrinthExplorer = getKoin().get()
         title = "ButtonKram"
         minimumSize =  Dimension(400, 400)
         defaultCloseOperation = EXIT_ON_CLOSE
-        val robotController = RobotController()
+
         //val labyrinthExplorer: LabyrinthExplorer = getKoin().get()  // LabyrinthExplorer instanziieren
 
 
         layout = GridLayout(3, 3)
         add(JPanel())
-        val forward = JButton("A")
+        val forward = JButton("scan")
         forward.addActionListener {
-            robotController.turnEyes(EyesDirection.FRONT)
+            labyrinthExplorer.scanCell()
         }
         add(forward)
 
         add(JPanel())
-        val left = JButton("<")
+        val left = JButton("print")
         left.addActionListener {
-           robotController.turnEyes(EyesDirection.LEFT)
+           labyrinthExplorer.printCellBoarders()
         }
         add(left)
         add(JPanel())
@@ -42,9 +45,9 @@ class TestGui: JFrame() {
         }
         add(right)
         add(JPanel())
-        val back = JButton("V")
+        val back = JButton("move South")
         back.addActionListener {
-            robotController.turnEyes(EyesDirection.BACK)
+            labyrinthExplorer.driveSouth()
         }
         add(back)
 

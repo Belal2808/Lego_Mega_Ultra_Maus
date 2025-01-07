@@ -1,17 +1,21 @@
 package de.fhkiel.rob.legoosctester
 
 class MovementManager(
-    private val robotActionHandler: RobotController
+    robotController: RobotController
 ) {
     private val movementQueue: MutableList<() -> Unit> = mutableListOf()
     private var isProcessingMovement = false
 
-    fun enqueueMovement(movement: () -> Unit) {
-        movementQueue.add(movement)
+    init {
+        robotController.addMovementCompleteListener { onMovementComplete() }
+    }
+
+    fun enqueueMovements(movements: List<() -> Unit>) {
+        movementQueue.addAll(movements)
+        println("Enqueued movements: $movements")
         if (!isProcessingMovement) {
             processNextMovement()
         }
-
     }
 
     private fun processNextMovement() {
@@ -23,6 +27,7 @@ class MovementManager(
     }
 
     private fun onMovementComplete() {
+        print(movementQueue.size)
         isProcessingMovement = false
         processNextMovement()
     }
