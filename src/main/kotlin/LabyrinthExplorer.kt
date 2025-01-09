@@ -13,7 +13,7 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
     fun driveNorth(){
         lastCellDirection = RoboterDirection.SOUTH
         val roboterPosition = labyrinthStateService.getRobotPosition()
-        labyrinthStateService.setRobotPosition(roboterPosition.first,roboterPosition.second+1)
+        labyrinthStateService.setRobotPosition(roboterPosition.first,roboterPosition.second-1)
         movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.NORTH)
     }
     fun driveEast(){
@@ -25,7 +25,7 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
     fun driveSouth(){
         lastCellDirection = RoboterDirection.NORTH
         val roboterPosition = labyrinthStateService.getRobotPosition()
-        labyrinthStateService.setRobotPosition(roboterPosition.first,roboterPosition.second-1)
+        labyrinthStateService.setRobotPosition(roboterPosition.first,roboterPosition.second+1)
         movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.SOUTH)
     }
 

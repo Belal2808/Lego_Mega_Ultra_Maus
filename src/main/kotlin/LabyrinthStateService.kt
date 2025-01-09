@@ -10,6 +10,7 @@ interface LabyrinthStateService {
     fun moveRoboterNorth()
     fun moveRoboterWest()
     fun moveRoboterEast()
+    fun setCurrentCellBorder(roboterDirection: RoboterDirection, cellBoarder: CellBoarder)
     fun addListener(listener: LabyrinthStateListener)
     fun removeListener(listener: LabyrinthStateListener)
     fun addCell(x: Int, y: Int, cell: Cell)

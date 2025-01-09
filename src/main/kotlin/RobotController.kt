@@ -134,17 +134,20 @@ class RobotController {
             val currentsPosition = labyrinthState.getRobotPosition()
             val currentCell = labyrinthState.getCell(currentsPosition.first,currentsPosition.second)
             val list = currentCell?.getUndiscoveredBorders()
-
-            if(list!!.isEmpty()){
+            if(list == null){
+                notifyMovementComplete(RoboterControls.NONE)
+                return
+            }
+            if(list.isEmpty()){
                 notifyMovementComplete(RoboterControls.NONE)
                 return
             }
             if(args[0] as Int >250){
                 println(list.first())
-                currentCell.setBorder(list.first(),CellBoarder.UNDISCOVERED)
+                labyrinthState.setCurrentCellBorder(list.first(),CellBoarder.UNDISCOVERED)
             }else{
                 println(list.first())
-                currentCell.setBorder(list.first(),CellBoarder.WALL)
+                labyrinthState.setCurrentCellBorder(list.first(),CellBoarder.WALL)
             }
          notifyMovementComplete(RoboterControls.NONE)
         } else if (path == "/OSCBrick@${roboterState.robotIp}/color/s2/is") {

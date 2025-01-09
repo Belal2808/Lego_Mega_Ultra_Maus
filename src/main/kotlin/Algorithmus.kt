@@ -1,11 +1,5 @@
 package de.fhkiel.rob.legoosctester
 
-import java.util.*
-import de.fhkiel.rob.legoosctester.gui.MapController // Für GUI-Interaktion
-import de.fhkiel.rob.legoosctester.LabyrinthStateService // Für Zugriff auf Zellen
-import de.fhkiel.rob.legoosctester.Cell // Für Zellenobjekte
-import de.fhkiel.rob.legoosctester.RoboterDirection // Für Richtungen
-import de.fhkiel.rob.legoosctester.CellBoarder // Für Zellenbegrenzungen
 import de.fhkiel.rob.legoosctester.gui.MapCanvas
 import java.awt.Color // Für Farbinformationen
 import java.util.PriorityQueue // Für den Dijkstra-Algorithmus
@@ -84,7 +78,7 @@ class Algorithmus(
 
         return path
     }
-     fun calculateAndMoveToNextTarget(labyrinthState: LabyrinthStateService, mapController: MapController) {
+     fun calculateAndMoveToNextTarget(labyrinthState: LabyrinthStateService) {
         val currentPosition = labyrinthState.getRobotPosition()
         println("Aktueller Startpunkt: $currentPosition")
 
@@ -93,7 +87,7 @@ class Algorithmus(
 
         if (targets.isEmpty()) {
             println("Keine Farbzellen verfügbar.")
-            removeCyanPath(labyrinthState, mapController)
+            removeCyanPath(labyrinthState)
             return
         }
 
@@ -103,7 +97,7 @@ class Algorithmus(
         }
         if (nextTarget == null) {
             println("Kein gültiger Pfad zu einer Farbzelle gefunden.")
-            removeCyanPath(labyrinthState, mapController)
+            removeCyanPath(labyrinthState)
             return
         }
 
@@ -112,21 +106,7 @@ class Algorithmus(
             val cellHere = labyrinthState.getCell(currentPosition.first, currentPosition.second)
             if (cellHere != null && cellHere.isColorField) {
                 // isColorField deaktivieren
-                val updated = cellHere.copy(isColorField = false)
-
-                // Borders-Map unverändert übernehmen
-                val newBorders = updated.borders.toMutableMap()
-
-                mapController.addSimulatedCell(
-                    x = currentPosition.first,
-                    y = currentPosition.second,
-                    color      = updated.color,
-                    bordersMap = newBorders,
-                    isEntrance = updated.isEntrance,
-                    isColorField = false,
-                    priority   = updated.priority,
-                    isBlocked  = updated.isBlocked
-                )
+                cellHere.isColorField = false
             }
             return
         }
@@ -134,29 +114,18 @@ class Algorithmus(
         val path = findPathDijkstra(currentPosition, nextTarget)
         if (path.isEmpty()) {
             println("Kein gültiger Pfad zum Ziel gefunden.")
-            removeCyanPath(labyrinthState, mapController)
+            removeCyanPath(labyrinthState)
             return
         }
 
         println("Berechneter Pfad: $path")
-        removeCyanPath(labyrinthState, mapController)
+        removeCyanPath(labyrinthState)
 
         // Markiere Pfad als CYAN
         for ((px, py) in path) {
             val oldCell = labyrinthState.getCell(px, py) ?: Cell()
             if (!oldCell.isBlocked && oldCell.color == Color.LIGHT_GRAY) {
-                val newBorders = oldCell.borders.toMutableMap()
-
-                mapController.addSimulatedCell(
-                    x = px,
-                    y = py,
-                    color = Color.CYAN,
-                    bordersMap = newBorders,
-                    isEntrance  = oldCell.isEntrance,
-                    isColorField= oldCell.isColorField,
-                    priority    = oldCell.priority,
-                    isBlocked   = oldCell.isBlocked
-                )
+                oldCell.color = Color.CYAN
             }
         }
         mapCanvas.repaint()
@@ -166,11 +135,11 @@ class Algorithmus(
         currentPath = path.toMutableList()
 
         movementTimer = Timer(500) {
-            moveRobotOneStep(labyrinthState, mapController)
+            moveRobotOneStep(labyrinthState)
         }
         movementTimer?.start()
     }
-    private fun moveRobotOneStep(labyrinthState: LabyrinthStateService, mapController: MapController) {
+    private fun moveRobotOneStep(labyrinthState: LabyrinthStateService) {
         if (currentPath.isEmpty()) {
             println("Pfad vollständig abgefahren. Stoppe Bewegung.")
             movementTimer?.stop()
@@ -180,23 +149,10 @@ class Algorithmus(
                 val cell = labyrinthState.getCell(pos.first, pos.second)
                 if (cell != null && cell.isColorField) {
                     println("Farbziel erreicht bei $pos.")
-                    // isColorField = false
-                    val updatedCell = cell.copy(isColorField = false)
-                    val newBorders  = updatedCell.borders.toMutableMap()
-
-                    mapController.addSimulatedCell(
-                        x = pos.first,
-                        y = pos.second,
-                        color      = updatedCell.color,
-                        bordersMap = newBorders,
-                        isEntrance = updatedCell.isEntrance,
-                        isColorField = false,
-                        priority   = updatedCell.priority,
-                        isBlocked  = updatedCell.isBlocked
-                    )
+                    cell.color = Color.LIGHT_GRAY
 
                     // Nächstes Ziel
-                    calculateAndMoveToNextTarget(labyrinthState, mapController)
+                    calculateAndMoveToNextTarget(labyrinthState)
                 }
             }
             return
@@ -206,35 +162,16 @@ class Algorithmus(
         println("Bewege Roboter zu: $nextCoord")
 
         val oldPos = labyrinthState.getRobotPosition()
-        if (oldPos != null) {
-            val dx = nextCoord.first - oldPos.first
-            val dy = nextCoord.second - oldPos.second
-            val newDirection = when {
-                dx > 0 -> RoboterDirection.EAST
-                dx < 0 -> RoboterDirection.WEST
-                dy > 0 -> RoboterDirection.SOUTH
-                else   -> RoboterDirection.NORTH
-            }
-            mapCanvas.updateRobotDirection(newDirection)
+        val dx = nextCoord.first - oldPos.first
+        val dy = nextCoord.second - oldPos.second
         }
-
-        mapCanvas.updateRobotPosition(nextCoord.first, nextCoord.second)
+        //bewege roboter in richtung
     }
-    private fun removeCyanPath(labyrinthState: LabyrinthStateService, mapController: MapController) {
+    private fun removeCyanPath(labyrinthState: LabyrinthStateService) {
         for ((coords, cell) in labyrinthState.getCells()) {
             if (cell.color == Color.CYAN) {
-                val newBorders = cell.borders.toMutableMap()
-                mapController.addSimulatedCell(
-                    coords.first, coords.second,
-                    color = Color.LIGHT_GRAY,
-                    bordersMap = newBorders,
-                    isEntrance  = cell.isEntrance,
-                    isColorField= cell.isColorField,
-                    priority    = cell.priority,
-                    isBlocked   = cell.isBlocked
-                )
+                cell.color = Color.LIGHT_GRAY
             }
         }
     }
 
-}

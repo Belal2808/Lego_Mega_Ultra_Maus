@@ -30,59 +30,27 @@ class MainGUI : JFrame() {
         defaultCloseOperation = EXIT_ON_CLOSE
 
         val labyrinthState: LabyrinthStateService = getKoin().get()
-        val mapController = MapController(labyrinthState, mapCanvas)
 
         add(mapCanvas)
 
         addKeyListener(object : KeyListener {
             override fun keyPressed(e: KeyEvent) {
                 when (e.keyCode) {
-                    // M => R/G/B-Farben wiederherstellen
-                    KeyEvent.VK_M -> {
-                        resetColorFields(labyrinthState, mapController)
-                    }
                     // WASD => Bewegung
                     KeyEvent.VK_W -> {
                         labyrinthExplorer.driveNorth()
-                        labyrinthState.moveRoboterNorth()
                     }
                     KeyEvent.VK_S -> {
                         labyrinthExplorer.driveSouth()
-                        labyrinthState.moveRoboterSouth()
                     }
                     KeyEvent.VK_A -> {
                         labyrinthExplorer.driveWest()
-                        labyrinthState.moveRoboterWest()
                     }
                     KeyEvent.VK_D -> {
                         labyrinthExplorer.driveEast()
-                        labyrinthState.moveRoboterEast()
                     }
                     KeyEvent.VK_SPACE -> {
                         labyrinthExplorer.scanCell()
-                        val position = labyrinthState.getRobotPosition()
-                        val currentCell = labyrinthState.getCell(position.first, position.second)
-
-                        if (currentCell != null) {
-
-                            val updatedBorders = currentCell.borders.toMutableMap()
-
-
-                            mapController.addSimulatedCell(
-                                position.first,
-                                position.second,
-                                color = currentCell.color,
-                                bordersMap = updatedBorders,
-                                isEntrance = currentCell.isEntrance,
-                                isColorField = currentCell.isColorField,
-                                priority = currentCell.priority,
-                                isBlocked = currentCell.isBlocked
-                            )
-
-                            println("Zelle gescannt und aktualisiert bei (${position.first}, ${position.second}).")
-                        } else {
-                            println("Fehler: Keine Zelle an der Position (${position.first}, ${position.second}) gefunden.")
-                        }
                     }
                     // P => Export
                     KeyEvent.VK_P -> {
@@ -100,7 +68,7 @@ class MainGUI : JFrame() {
                     }
                     // F => Pfad suchen
                     KeyEvent.VK_F -> {
-                        algorithmus.calculateAndMoveToNextTarget(labyrinthState, mapController)
+                        algorithmus.calculateAndMoveToNextTarget(labyrinthState)
                     }
                 }
                 println("Position: ($x, $y), Farbe: $currentColor, Richtung: $currentDirection")
@@ -111,29 +79,6 @@ class MainGUI : JFrame() {
         })
 
         isVisible = true
-    }
-
-
-    private fun resetColorFields(labyrinthState: LabyrinthStateService, mapController: MapController) {
-        for ((coords, cell) in labyrinthState.getCells()) {
-            val c = cell.color
-            val isRGB = (c == Color.RED || c == Color.GREEN || c == Color.BLUE)
-            if (isRGB && !cell.isColorField) {
-                val newBorders = cell.borders.toMutableMap()
-
-                mapController.addSimulatedCell(
-                    coords.first, coords.second,
-                    color = cell.color,
-                    bordersMap = newBorders,
-                    isEntrance  = cell.isEntrance,
-                    isColorField= true,
-                    priority    = cell.priority,
-                    isBlocked   = cell.isBlocked
-                )
-                println("Zelle $coords mit Farbe $c wieder als isColorField=true aktiviert.")
-            }
-        }
-        println("Alle R/G/B-Zellen reaktiviert, du kannst F erneut verwenden.")
     }
 }
 

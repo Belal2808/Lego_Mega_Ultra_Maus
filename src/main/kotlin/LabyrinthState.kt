@@ -64,22 +64,32 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
 
     override fun moveRoboterSouth() {
         currentY++
+        println(getRobotPosition().toString())
         notifyListeners()
     }
 
     override fun moveRoboterNorth() {
         currentY--
+        println(getRobotPosition().toString())
         notifyListeners()
     }
 
     override fun moveRoboterWest() {
         currentX++
+        println(getRobotPosition().toString())
         notifyListeners()
     }
 
     override fun moveRoboterEast() {
-        currentX--
+        setRobotPosition(currentX-1,currentY)
+        println(getRobotPosition().toString())
         notifyListeners()
+    }
+
+    override fun setCurrentCellBorder(roboterDirection: RoboterDirection, cellBoarder: CellBoarder){
+        labyrinth[Pair(currentX, currentY)]!!.setBorder(roboterDirection,cellBoarder)
+        notifyListeners()
+
     }
 
     override fun getNeighbors(x: Int, y: Int): List<Pair<Int, Int>> {

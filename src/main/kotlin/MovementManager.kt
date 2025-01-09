@@ -31,5 +31,4 @@ class MovementManager(
         isProcessingMovement = false
         processNextMovement()
     }
-
 }
