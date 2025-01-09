@@ -31,7 +31,7 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
 
     fun scanCell() {
         val position = labyrinthStateService.getRobotPosition()
-       var currentCell = labyrinthStateService.getCell(position.first,position.second)
+        var currentCell = labyrinthStateService.getCell(position.first,position.second)
         if(currentCell == null){
             currentCell = Cell()
         }

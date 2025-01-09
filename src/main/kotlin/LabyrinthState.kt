@@ -1,19 +1,36 @@
 package de.fhkiel.rob.legoosctester
 
-import jdk.internal.net.http.common.Pair.pair
 import java.awt.Color
 import java.util.PriorityQueue
 
+interface LabyrinthStateListener {
+    fun onStateChanged()
+}
+
 class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
+    private val listeners = mutableListOf<LabyrinthStateListener>()
     private var currentX : Int = rows/2
     private var currentY : Int = columns/2
     private val labyrinth = mutableMapOf<Pair<Int, Int>, Cell>() // Map von Koordinaten zu Zellen
+
+    override fun addListener(listener: LabyrinthStateListener) {
+        listeners.add(listener)
+    }
+
+    override fun removeListener(listener: LabyrinthStateListener) {
+        listeners.remove(listener)
+    }
+
+    private fun notifyListeners() {
+        listeners.forEach { it.onStateChanged() }
+    }
 
     /**
      * Fügt eine Zelle hinzu oder aktualisiert sie.
      */
     override fun addCell(x: Int, y: Int, cell: Cell) {
         labyrinth[Pair(x, y)] = cell
+        notifyListeners()
     }
 
     /**
@@ -30,9 +47,9 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
         return labyrinth[Pair(x, y)]
     }
 
-
     override fun updateCell(x: Int, y: Int, cell: Cell) {
         labyrinth[Pair(x, y)] = cell
+        notifyListeners()
     }
 
     override fun getRobotPosition(): Pair<Int, Int> {
@@ -42,6 +59,27 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
     override fun setRobotPosition(x: Int, y: Int) {
         currentX = x
         currentY = y
+        notifyListeners()
+    }
+
+    override fun moveRoboterSouth() {
+        currentY++
+        notifyListeners()
+    }
+
+    override fun moveRoboterNorth() {
+        currentY--
+        notifyListeners()
+    }
+
+    override fun moveRoboterWest() {
+        currentX++
+        notifyListeners()
+    }
+
+    override fun moveRoboterEast() {
+        currentX--
+        notifyListeners()
     }
 
     fun getNeighbors(x: Int, y: Int): List<Pair<Int, Int>> {
@@ -153,7 +191,6 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
             }
         }
 
-        // Pfad zurückverfolgen
         val path = mutableListOf<Pair<Int, Int>>()
         var step: Pair<Int, Int>? = goal
         while (step != null && step != start) {
@@ -171,21 +208,30 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
 
         return path
     }
+
  override fun processColorSensorData(args: List<Any>) {
-        val colorString = args[0] as String
+     val colorString = args[0] as String
+     val currentCell = labyrinth[Pair(currentX, currentY)]!!
+     when(colorString) {
+            "blue" -> {
+                currentCell.color = Color.BLUE
+                currentCell.isColorField = true
+            }
 
+            "green" -> {
+                currentCell.color = Color.GREEN
+                currentCell.isColorField = true
+            }
 
-        labyrinth[Pair(currentX,currentY)]!!.color = when (colorString.lowercase()) {
-            "black" -> Color.BLACK
-            "blue" -> Color.BLUE
-            "green" -> Color.GREEN
-            "yellow" -> Color.YELLOW
-            "red" -> Color.RED
-            "white" -> Color.WHITE
-            "brown" -> Color(139, 69, 19)
-            else -> Color.LIGHT_GRAY
+            "red" -> {
+                currentCell.color = Color.RED
+                currentCell.isColorField = true
+            }
+            else -> {
+                currentCell.color = Color.LIGHT_GRAY
+                currentCell.isColorField = false
+            }
         }
-
     }
 
 

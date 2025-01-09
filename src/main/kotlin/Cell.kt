@@ -11,10 +11,10 @@ data class Cell(
     ),
 
     var color: Color = Color.LIGHT_GRAY, // Standardfarbe
-    val isEntrance: Boolean = false, // Eingang
-    val isColorField: Boolean = false, // Farbfeld
-    val priority: Int = 0, // Priorität für Farbplatten
-    val isBlocked: Boolean = false, //
+    var isEntrance: Boolean = false, // Eingang
+    var isColorField: Boolean = false, // Farbfeld
+    var priority: Int = 0, // Priorität für Farbplatten
+    var isBlocked: Boolean = false, //
 ){
     fun getBorder(direction: RoboterDirection): CellBoarder = borders[direction] ?: CellBoarder.NONE
 
