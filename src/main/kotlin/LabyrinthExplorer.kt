@@ -46,6 +46,7 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
                 movementPlanner.planAndExecuteEyeMovement(undiscoveredBoarder)
             }
         }
+        movementPlanner.planAndExecuteColorScan()
         movementPlanner.resetEyes()
     }
 }

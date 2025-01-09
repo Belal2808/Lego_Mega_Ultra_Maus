@@ -10,7 +10,7 @@ data class Cell(
         RoboterDirection.WEST to CellBoarder.NONE
     ),
 
-    val color: Color = Color.LIGHT_GRAY, // Standardfarbe
+    var color: Color = Color.LIGHT_GRAY, // Standardfarbe
     val isEntrance: Boolean = false, // Eingang
     val isColorField: Boolean = false, // Farbfeld
     val priority: Int = 0, // Priorität für Farbplatten

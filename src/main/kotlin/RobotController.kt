@@ -3,6 +3,7 @@ package de.fhkiel.rob.legoosctester
 import org.koin.mp.KoinPlatform.getKoin
 import de.fhkiel.rob.legoosctester.osc.OSCSender
 import de.fhkiel.rob.legoosctester.osc.OSCReceiver
+import java.awt.Color
 import java.lang.Thread.sleep
 
 enum class RoboterControls{
@@ -100,6 +101,9 @@ class RobotController {
     }
 
 
+
+
+
     fun addMovementCompleteListener(listener: (RoboterControls) -> Unit) {
         movementListeners.add(listener)
     }
@@ -142,6 +146,9 @@ class RobotController {
                 println(list.first())
                 currentCell.setBorder(list.first(),CellBoarder.WALL)
             }
+         notifyMovementComplete(RoboterControls.NONE)
+        } else if (path == "/OSCBrick@${roboterState.robotIp}/color/s2/is") {
+         labyrinthState.processColorSensorData(args)
          notifyMovementComplete(RoboterControls.NONE)
         }else{
          notifyMovementComplete(RoboterControls.NONE)

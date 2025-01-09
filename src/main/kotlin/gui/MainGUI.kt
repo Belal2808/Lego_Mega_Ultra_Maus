@@ -16,7 +16,6 @@ class MainGUI : JFrame() {
     private var currentColor = Color.LIGHT_GRAY
     private var currentDirection = RoboterDirection.NORTH  // Verwende RoboterDirection
 
-    // MapCanvas liegt im selben Package (ggf. anpassen!)
     val mapCanvas = MapCanvas()
 
     private var movementTimer: Timer? = null
@@ -76,26 +75,37 @@ class MainGUI : JFrame() {
                         println("Zelle erstellt bei ($x, $y)")
                     }
 
-                    // SPACE => Wand in currentDirection
+
                     KeyEvent.VK_SPACE -> {
-                        val oldCell = labyrinthState.getCell(x, y) ?: Cell()
 
-                        // Kopiere altes borders
-                        val newBorders = oldCell.borders.toMutableMap()
-                        // Setze in currentDirection => WALL
-                        newBorders[currentDirection] = CellBoarder.WALL
+                        labyrinthExplorer.scanCell()
 
-                        mapController.addSimulatedCell(
-                            x, y,
-                            color       = oldCell.color,
-                            bordersMap  = newBorders,
-                            isEntrance  = oldCell.isEntrance,
-                            isColorField= oldCell.isColorField,
-                            priority    = oldCell.priority,
-                            isBlocked   = oldCell.isBlocked
-                        )
-                        println("Wand bei ($x, $y) in Richtung $currentDirection")
+
+                        val position = labyrinthState.getRobotPosition()
+                        val currentCell = labyrinthState.getCell(position.first, position.second)
+
+                        if (currentCell != null) {
+
+                            val updatedBorders = currentCell.borders.toMutableMap()
+
+
+                            mapController.addSimulatedCell(
+                                position.first,
+                                position.second,
+                                color = currentCell.color,
+                                bordersMap = updatedBorders,
+                                isEntrance = currentCell.isEntrance,
+                                isColorField = currentCell.isColorField,
+                                priority = currentCell.priority,
+                                isBlocked = currentCell.isBlocked
+                            )
+
+                            println("Zelle gescannt und aktualisiert bei (${position.first}, ${position.second}).")
+                        } else {
+                            println("Fehler: Keine Zelle an der Position (${position.first}, ${position.second}) gefunden.")
+                        }
                     }
+
 
                     // N => Grau färben, isColorField behalten
                     KeyEvent.VK_N -> {

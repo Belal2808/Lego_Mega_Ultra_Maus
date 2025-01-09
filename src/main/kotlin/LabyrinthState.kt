@@ -1,5 +1,7 @@
 package de.fhkiel.rob.legoosctester
 
+import jdk.internal.net.http.common.Pair.pair
+import java.awt.Color
 import java.util.PriorityQueue
 
 class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
@@ -169,4 +171,22 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
 
         return path
     }
+ override fun processColorSensorData(args: List<Any>) {
+        val colorString = args[0] as String
+
+
+        labyrinth[Pair(currentX,currentY)]!!.color = when (colorString.lowercase()) {
+            "black" -> Color.BLACK
+            "blue" -> Color.BLUE
+            "green" -> Color.GREEN
+            "yellow" -> Color.YELLOW
+            "red" -> Color.RED
+            "white" -> Color.WHITE
+            "brown" -> Color(139, 69, 19)
+            else -> Color.LIGHT_GRAY
+        }
+
+    }
+
+
 }
