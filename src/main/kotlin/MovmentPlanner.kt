@@ -25,6 +25,12 @@ class MovementPlanner(
         movementManager.enqueueMovements(movements)
     }
 
+    fun scanColor(){
+        val movements = mutableListOf<() -> Unit>()
+        movements.addAll(robotController.smellColor())
+        movementManager.enqueueMovements(movements)
+    }
+
     private fun calculateEyeMovementToTargetDirection( currentDirection: RoboterDirection, targetDirection: RoboterDirection): List<() -> Unit> {
         val movements = mutableListOf<() -> Unit>()
 

@@ -28,6 +28,9 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
         return labyrinth[Pair(x, y)]
     }
 
+    override fun getCurrentCell(): Cell? {
+        return labyrinth[Pair(currentX,currentY)]
+    }
 
     override fun updateCell(x: Int, y: Int, cell: Cell) {
         labyrinth[Pair(x, y)] = cell
@@ -35,6 +38,14 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
 
     override fun getRobotPosition(): Pair<Int, Int> {
         return Pair(currentX, currentY)
+    }
+
+    override fun getXRoboterPosition(): Int{
+        return currentX
+    }
+
+    override fun getYRoboterPosition(): Int{
+        return currentY
     }
 
     override fun setRobotPosition(x: Int, y: Int) {
@@ -104,7 +115,7 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
      * Findet einen Pfad von Start zu Ziel unter Verwendung des Dijkstra-Algorithmus.
      */
     override fun findPathDijkstra(start: Pair<Int, Int>, goal: Pair<Int, Int>): List<Pair<Int, Int>> {
-        // Überprüfen, ob Start und Ziel existieren
+
         if (getCell(start.first,start.second) == null) {
             println("Startpunkt $start existiert nicht.")
             return emptyList()

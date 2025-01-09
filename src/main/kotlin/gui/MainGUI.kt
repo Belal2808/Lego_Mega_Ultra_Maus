@@ -14,7 +14,7 @@ import org.koin.mp.KoinPlatform.getKoin
 
 class MainGUI : JFrame() {
     private var currentColor = Color.LIGHT_GRAY
-    private var currentDirection = RoboterDirection.NORTH  // Verwende RoboterDirection
+    private  val roboterState: RobotStateService = getKoin().get()
 
     // MapCanvas liegt im selben Package (ggf. anpassen!)
     val mapCanvas = MapCanvas()
@@ -44,57 +44,26 @@ class MainGUI : JFrame() {
                     // WASD => Bewegung
                     KeyEvent.VK_W -> {
                         labyrinthExplorer.driveNorth()
-                        mapCanvas.updateRobotDirection(RoboterDirection.NORTH)
+                        mapCanvas.updateRobotDirection(roboterState.getRoboterDirection())
                     }
                     KeyEvent.VK_S -> {
                         labyrinthExplorer.driveSouth()
-                        mapCanvas.updateRobotDirection(RoboterDirection.SOUTH)
+                        mapCanvas.updateRobotDirection(roboterState.getRoboterDirection())
                     }
                     KeyEvent.VK_A -> {
                         labyrinthExplorer.driveWest()
-                        mapCanvas.updateRobotDirection(RoboterDirection.WEST)
+                        mapCanvas.updateRobotDirection(roboterState.getRoboterDirection())
                     }
                     KeyEvent.VK_D -> {
                         labyrinthExplorer.driveEast()
-                        mapCanvas.updateRobotDirection(RoboterDirection.EAST)
+                        mapCanvas.updateRobotDirection(roboterState.getRoboterDirection())
                     }
 
 
                     // ENTER => Neue Zelle mit UNDISCOVERED-Borders
                     KeyEvent.VK_ENTER -> {
-                        val newBorders = mutableMapOf(
-                            RoboterDirection.NORTH to CellBoarder.UNDISCOVERED,
-                            RoboterDirection.EAST  to CellBoarder.UNDISCOVERED,
-                            RoboterDirection.SOUTH to CellBoarder.UNDISCOVERED,
-                            RoboterDirection.WEST  to CellBoarder.UNDISCOVERED
-                        )
-                        mapController.addSimulatedCell(
-                            x, y,
-                            color = currentColor,
-                            bordersMap = newBorders
-                        )
-                        println("Zelle erstellt bei ($x, $y)")
-                    }
-
-                    // SPACE => Wand in currentDirection
-                    KeyEvent.VK_SPACE -> {
-                        val oldCell = labyrinthState.getCell(x, y) ?: Cell()
-
-                        // Kopiere altes borders
-                        val newBorders = oldCell.borders.toMutableMap()
-                        // Setze in currentDirection => WALL
-                        newBorders[currentDirection] = CellBoarder.WALL
-
-                        mapController.addSimulatedCell(
-                            x, y,
-                            color       = oldCell.color,
-                            bordersMap  = newBorders,
-                            isEntrance  = oldCell.isEntrance,
-                            isColorField= oldCell.isColorField,
-                            priority    = oldCell.priority,
-                            isBlocked   = oldCell.isBlocked
-                        )
-                        println("Wand bei ($x, $y) in Richtung $currentDirection")
+                        labyrinthExplorer.scanCell()
+                        println(labyrinthState.getCurrentCell()!!.borders.toString())
                     }
 
                     // N => Grau färben, isColorField behalten
@@ -218,24 +187,6 @@ class MainGUI : JFrame() {
                         entrance?.let { mapCanvas.updateRobotPosition(it.first, it.second) }
                     }
 
-                    // 1,2,3,4 => Richtung
-                    KeyEvent.VK_1 -> {
-                        currentDirection = RoboterDirection.NORTH
-                        println("Richtung: Norden")
-                    }
-                    KeyEvent.VK_2 -> {
-                        currentDirection = RoboterDirection.EAST
-                        println("Richtung: Osten")
-                    }
-                    KeyEvent.VK_3 -> {
-                        currentDirection = RoboterDirection.SOUTH
-                        println("Richtung: Süden")
-                    }
-                    KeyEvent.VK_4 -> {
-                        currentDirection = RoboterDirection.WEST
-                        println("Richtung: Westen")
-                    }
-
                     // F => Pfad suchen
                     KeyEvent.VK_F -> {
                         calculateAndMoveToNextTarget(labyrinthState, mapController)
@@ -244,7 +195,7 @@ class MainGUI : JFrame() {
 
                 // Position updaten
                 mapCanvas.updateRobotPosition(labyrinthState.getRobotPosition().first,labyrinthState.getRobotPosition().second)
-                println("Position: ($x, $y), Farbe: $currentColor, Richtung: $currentDirection")
+                println("Position: ($x, $y), Farbe: $currentColor, Richtung: ${roboterState.getRoboterDirection()}")
             }
 
             override fun keyReleased(e: KeyEvent) {}
@@ -358,7 +309,7 @@ class MainGUI : JFrame() {
 
         if (nextTarget == currentPosition) {
             println("Nächstes Ziel == aktueller Standort: $currentPosition. Deaktiviere isColorField.")
-            val cellHere = labyrinthState.getCell(currentPosition.first, currentPosition.second)
+            val cellHere = labyrinthState.getCurrentCell()
             if (cellHere != null && cellHere.isColorField) {
                 // isColorField deaktivieren
                 val updated = cellHere.copy(isColorField = false)

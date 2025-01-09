@@ -3,6 +3,7 @@ package de.fhkiel.rob.legoosctester.gui
 import de.fhkiel.rob.legoosctester.Cell
 import de.fhkiel.rob.legoosctester.CellBoarder
 import de.fhkiel.rob.legoosctester.LabyrinthStateService
+import de.fhkiel.rob.legoosctester.RobotStateService
 import de.fhkiel.rob.legoosctester.RoboterDirection
 import org.koin.mp.KoinPlatform.getKoin
 import java.awt.Color
@@ -11,7 +12,8 @@ import javax.swing.JPanel
 
 class MapCanvas : JPanel() {
 
-    private val labyrinthState: LabyrinthStateService = getKoin().get()// Zustand der Karte
+    private val labyrinthState: LabyrinthStateService = getKoin().get()
+    private val roboterState: RobotStateService = getKoin().get()
 
     /**
      * Fügt eine Zelle hinzu und aktualisiert die Anzeige.

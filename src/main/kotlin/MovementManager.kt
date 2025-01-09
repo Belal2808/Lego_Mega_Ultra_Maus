@@ -12,7 +12,6 @@ class MovementManager(
 
     fun enqueueMovements(movements: List<() -> Unit>) {
         movementQueue.addAll(movements)
-        println("Enqueued movements: $movements")
         if (!isProcessingMovement) {
             processNextMovement()
         }
