@@ -12,7 +12,7 @@ class MapController(
      * Fügt eine Zelle an (x,y) hinzu oder aktualisiert sie.
      * @param x,y Koordinaten
      * @param color Farbe der Zelle
-     * @param bordersMap Neue or zu ergänzende Border-Map (NORTH->WALL, etc.)
+     * @parm bordersMap Neue or zu ergänzende Border-Map (NORTH->WALL, etc.)
      * @param isEntrance Ob die Zelle ein Eingang ist
      * @param isColorField Ob die Zelle Farbfeld sein soll
      * @param priority Priorität der Zelle
@@ -67,11 +67,6 @@ class MapController(
         )
 
         println("Neue/aktualisierte Zelle an Position ($x, $y): $newCell")
-
-        // In MapState und MapCanvas eintragen
-        labyrinthState.addCell(x, y, newCell)
-        mapCanvas.addCell(x, y, newCell)
-        mapCanvas.repaint()
 
         println("Zelle aktualisiert/erstellt: Position=($x, $y), Eigenschaften=$newCell")
     }

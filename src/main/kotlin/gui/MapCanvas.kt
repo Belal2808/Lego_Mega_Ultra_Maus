@@ -2,6 +2,7 @@ package de.fhkiel.rob.legoosctester.gui
 
 import de.fhkiel.rob.legoosctester.Cell
 import de.fhkiel.rob.legoosctester.CellBoarder
+import de.fhkiel.rob.legoosctester.LabyrinthStateListener
 import de.fhkiel.rob.legoosctester.LabyrinthStateService
 import de.fhkiel.rob.legoosctester.RoboterDirection
 import org.koin.mp.KoinPlatform.getKoin
@@ -9,17 +10,14 @@ import java.awt.Color
 import java.awt.Graphics
 import javax.swing.JPanel
 
-class MapCanvas : JPanel() {
+class MapCanvas : JPanel(), LabyrinthStateListener {
 
     private val labyrinthState: LabyrinthStateService = getKoin().get()// Zustand der Karte
 
-    /**
-     * Fügt eine Zelle hinzu und aktualisiert die Anzeige.
-     */
-    fun addCell(x: Int, y: Int, cell: Cell) {
-        labyrinthState.addCell(x, y, cell)
-        repaint()
+    init {
+        labyrinthState.addListener(this)
     }
+
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
@@ -119,17 +117,7 @@ class MapCanvas : JPanel() {
         }
     }
 
-    // Aktualisiert die Richtung
-    fun updateRobotDirection(direction: RoboterDirection) {
-        //robotDirection = direction
-        //println("Aktuelle Richtung des Roboters: $robotDirection")
-        repaint()
-    }
-
-    // Aktualisiert die Roboterposition
-    fun updateRobotPosition(x: Int, y: Int) {
-        labyrinthState.setRobotPosition(x,y)
-        println("Aktuelle Position des Roboters: $x, $y")
+    override fun onStateChanged() {
         repaint()
     }
 }
