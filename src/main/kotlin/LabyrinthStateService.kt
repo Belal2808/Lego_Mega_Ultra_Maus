@@ -8,5 +8,6 @@ interface LabyrinthStateService {
     fun setRobotPosition(x: Int, y: Int)
     fun addCell(x: Int, y: Int, cell: Cell)
     fun getCells(): Map<Pair<Int, Int>, Cell>
-    fun findPathDijkstra(start: Pair<Int, Int>, goal: Pair<Int, Int>): List<Pair<Int, Int>>
+    fun getNeighbors(x: Int, y: Int): List<Pair<Int, Int>>
+
 }

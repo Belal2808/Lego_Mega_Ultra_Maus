@@ -1,6 +1,5 @@
 package de.fhkiel.rob.legoosctester
 
-import jdk.internal.net.http.common.Pair.pair
 import java.awt.Color
 import java.util.PriorityQueue
 
@@ -44,7 +43,7 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
         currentY = y
     }
 
-    fun getNeighbors(x: Int, y: Int): List<Pair<Int, Int>> {
+    override fun getNeighbors(x: Int, y: Int): List<Pair<Int, Int>> {
         val neighbors = mutableListOf<Pair<Int, Int>>()
 
         val currentCell = getCell(x, y)
@@ -105,72 +104,7 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
     /**
      * Findet einen Pfad von Start zu Ziel unter Verwendung des Dijkstra-Algorithmus.
      */
-    override fun findPathDijkstra(start: Pair<Int, Int>, goal: Pair<Int, Int>): List<Pair<Int, Int>> {
-        // Überprüfen, ob Start und Ziel existieren
-        if (getCell(start.first,start.second) == null) {
-            println("Startpunkt $start existiert nicht.")
-            return emptyList()
-        }
-        if (getCell(goal.first,goal.second) == null) {
-            println("Zielpunkt $goal existiert nicht.")
-            return emptyList()
-        }
 
-        // Überprüfen, ob Startpunkt Nachbarn hat
-        if (getNeighbors(start.first, start.second).isEmpty()) {
-            println("Startpunkt $start hat keine erreichbaren Nachbarn.")
-            return emptyList()
-        }
-
-        // Initialisierung der Datenstrukturen
-        val distances = mutableMapOf<Pair<Int, Int>, Int>().withDefault { Int.MAX_VALUE }
-        val previous = mutableMapOf<Pair<Int, Int>, Pair<Int, Int>?>()
-        val priorityQueue = PriorityQueue<Pair<Int, Int>>(compareBy { distances.getValue(it) })
-
-        distances[start] = 0
-        priorityQueue.add(start)
-
-        println("Dijkstra-Algorithmus gestartet: Start=$start, Ziel=$goal")
-
-        while (priorityQueue.isNotEmpty()) {
-            val current = priorityQueue.poll()
-
-            // Ziel erreicht
-            if (current == goal) {
-                println("Ziel $goal erreicht.")
-                break
-            }
-
-            // Nachbarn verarbeiten
-            for (neighbor in getNeighbors(current.first, current.second)) {
-                val tentativeDistance = distances.getValue(current) + 1
-                if (tentativeDistance < distances.getValue(neighbor)) {
-                    distances[neighbor] = tentativeDistance
-                    previous[neighbor] = current
-                    priorityQueue.add(neighbor)
-                    println("Aktualisiert: $neighbor mit Distanz $tentativeDistance (Vorher: $current)")
-                }
-            }
-        }
-
-        // Pfad zurückverfolgen
-        val path = mutableListOf<Pair<Int, Int>>()
-        var step: Pair<Int, Int>? = goal
-        while (step != null && step != start) {
-            path.add(0, step)
-            step = previous[step]
-        }
-
-        if (step == start) {
-            path.add(0, start)
-            println("Pfad erfolgreich berechnet: $path")
-        } else {
-            println("Ziel $goal ist von $start aus nicht erreichbar.")
-            return emptyList()
-        }
-
-        return path
-    }
  override fun processColorSensorData(args: List<Any>) {
         val colorString = args[0] as String
 
