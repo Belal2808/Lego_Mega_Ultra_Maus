@@ -1,5 +1,6 @@
 package de.fhkiel.rob.legoosctester.gui
 
+import org.koin.mp.KoinPlatform.getKoin
 import java.awt.*
 import javax.swing.*
 
@@ -13,25 +14,30 @@ class MainGUI : JFrame() {
         layout = gridBagLayout
         constraints.insets = Insets(10, 15, 10, 15)
 
-
-
         constraints.gridx = 0
         constraints.gridy = 1
-        add(mapCanvas,constraints)
+        constraints.fill = GridBagConstraints.BOTH
+        add(mapCanvas, constraints)
 
-
+        val controlPanel = ControlPanel()
+        controlPanel.labyrinthExplorer = getKoin().get()
+        controlPanel.automaticExplorer = getKoin().get()
+        controlPanel.labyrinthState = getKoin().get()
+        controlPanel.algorithmus = getKoin().get()
 
         constraints.gridx = 1
         constraints.gridy = 1
-        add(JLabel("hier kommen roboter infos hin und steuereung"),constraints)
+        constraints.anchor = GridBagConstraints.SOUTHEAST
+        constraints.fill = GridBagConstraints.NONE
+        add(controlPanel, constraints)
 
         constraints.gridwidth = 2
         constraints.gridx = 0
         constraints.gridy = 0
         constraints.anchor = GridBagConstraints.CENTER
-        add(JLabel("Peter der tolle Roboter"),constraints)
-        pack()
+        add(JLabel("Peter der tolle Roboter"), constraints)
 
+        pack()
         isVisible = true
     }
 }

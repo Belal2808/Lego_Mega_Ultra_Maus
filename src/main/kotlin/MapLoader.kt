@@ -1,11 +1,14 @@
 package de.fhkiel.rob.legoosctester
 
+import de.fhkiel.rob.legoosctester.gui.MapCanvas
 import org.json.JSONArray
 import org.json.JSONObject
+import org.koin.mp.KoinPlatform
 import java.awt.Color
 import java.io.File
 
 class MapLoader {
+    private val mapCanvas: MapCanvas = KoinPlatform.getKoin().get()
     companion object {
         fun exportMap(labyrinthState: LabyrinthStateService, filename: String) {
             val file = File(filename)
@@ -71,8 +74,9 @@ class MapLoader {
                     priority = priority,
                     isBlocked = isBlocked
                 )
-                cellsMap[Pair(x, y)] = newCell
+               labyrinthState.addCell(x, y, newCell)
             }
+
         }
     }
 }
