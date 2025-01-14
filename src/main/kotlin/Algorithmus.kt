@@ -78,7 +78,7 @@ class Algorithmus(
 
         return path
     }
-     fun calculateAndMoveToNextTarget(labyrinthState: LabyrinthStateService) {
+    fun calculateAndMoveToNextTarget(labyrinthState: LabyrinthStateService) {
         val currentPosition = labyrinthState.getRobotPosition()
         println("Aktueller Startpunkt: $currentPosition")
 
@@ -86,8 +86,27 @@ class Algorithmus(
         println("Aktuelle Farbziele: $targets")
 
         if (targets.isEmpty()) {
-            println("Keine Farbzellen verfügbar.")
-            removeCyanPath(labyrinthState)
+            println("Keine Farbzellen verfügbar. Zurück zum Eingang.")
+            val entrancePosition = labyrinthState.getCells().entries.find { it.value.isEntrance }?.key
+
+            if (entrancePosition != null) {
+                val pathToEntrance = findPathDijkstra(currentPosition, entrancePosition)
+                if (pathToEntrance.isNotEmpty()) {
+                    println("Pfad zum Eingang: $pathToEntrance")
+                    currentPath.clear()
+                    currentPath.addAll(pathToEntrance)
+
+                    movementTimer?.stop()
+                    movementTimer = Timer(500) {
+                        moveRobotOneStep(labyrinthState)
+                    }
+                    movementTimer?.start()
+                } else {
+                    println("Kein gültiger Pfad zum Eingang gefunden.")
+                }
+            } else {
+                println("Eingang nicht definiert.")
+            }
             return
         }
 
@@ -105,7 +124,6 @@ class Algorithmus(
             println("Nächstes Ziel == aktueller Standort: $currentPosition. Deaktiviere isColorField.")
             val cellHere = labyrinthState.getCell(currentPosition.first, currentPosition.second)
             if (cellHere != null && cellHere.isColorField) {
-                // isColorField deaktivieren
                 cellHere.isColorField = false
             }
             return
@@ -145,33 +163,49 @@ class Algorithmus(
             movementTimer?.stop()
 
             val pos = labyrinthState.getRobotPosition()
-            if (pos != null) {
-                val cell = labyrinthState.getCell(pos.first, pos.second)
-                if (cell != null && cell.isColorField) {
-                    println("Farbziel erreicht bei $pos.")
-                    cell.color = Color.LIGHT_GRAY
+            val cell = labyrinthState.getCell(pos.first, pos.second)
+            if (cell != null && cell.isColorField) {
+                println("Farbziel erreicht bei $pos.")
+                cell.color = Color.LIGHT_GRAY
+                cell.isColorField = false
 
-                    // Nächstes Ziel
+                // Überprüfen, ob weitere Ziele verfügbar sind
+                val targets = labyrinthState.getCells().filterValues { it.isColorField }.keys
+                if (targets.isEmpty()) {
+                    println("Alle Farbziele abgefahren. Rückkehr zum Eingang.")
+                    val entrance = labyrinthState.getCells().entries.find { it.value.isEntrance }?.key
+                    if (entrance != null) {
+                        val pathToEntrance = findPathDijkstra(pos, entrance)
+                        if (pathToEntrance.isNotEmpty()) {
+                            println("Pfad zum Eingang berechnet: $pathToEntrance")
+                            currentPath.addAll(pathToEntrance)
+                            movementTimer?.start()
+                        } else {
+                            println("Kein gültiger Pfad zum Eingang gefunden.")
+                        }
+                    } else {
+                        println("Kein Eingang definiert.")
+                    }
+                } else {
+                    // Nächstes Ziel ansteuern
                     calculateAndMoveToNextTarget(labyrinthState)
                 }
             }
             return
         }
 
+        // Bewegung zum nächsten Punkt
         val nextCoord = currentPath.removeAt(0)
         println("Bewege Roboter zu: $nextCoord")
-
-        val oldPos = labyrinthState.getRobotPosition()
-        val dx = nextCoord.first - oldPos.first
-        val dy = nextCoord.second - oldPos.second
-        }
-        //bewege roboter in richtung
+        labyrinthState.setRobotPosition(nextCoord.first, nextCoord.second)
     }
+
     private fun removeCyanPath(labyrinthState: LabyrinthStateService) {
         for ((coords, cell) in labyrinthState.getCells()) {
             if (cell.color == Color.CYAN) {
                 cell.color = Color.LIGHT_GRAY
             }
         }
+    }
     }
 

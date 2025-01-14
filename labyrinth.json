@@ -1,47 +1,32 @@
 [
     {
         "isEntrance": false,
-        "color": "#00FFFF",
-        "borders": {
-            "NORTH": "DISCOVERED",
-            "WEST": "WALL",
-            "SOUTH": "WALL",
-            "EAST": "WALL"
-        },
-        "isColorField": false,
-        "x": 10,
-        "isBlocked": false,
-        "y": 10,
-        "priority": 0
-    },
-    {
-        "isEntrance": false,
-        "color": "#00FFFF",
+        "color": "#C0C0C0",
         "borders": {
             "NORTH": "WALL",
-            "WEST": "DISCOVERED",
-            "SOUTH": "DISCOVERED",
-            "EAST": "DISCOVERED"
+            "WEST": "WALL",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
         },
         "isColorField": false,
-        "x": 10,
+        "x": 0,
         "isBlocked": false,
-        "y": 9,
+        "y": 0,
         "priority": 0
     },
     {
         "isEntrance": false,
         "color": "#C0C0C0",
         "borders": {
-            "NORTH": "DISCOVERED",
-            "WEST": "DISCOVERED",
-            "SOUTH": "WALL",
-            "EAST": "WALL"
+            "NORTH": "UNDISCOVERED",
+            "WEST": "WALL",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
         },
         "isColorField": false,
-        "x": 11,
+        "x": 0,
         "isBlocked": false,
-        "y": 9,
+        "y": 1,
         "priority": 0
     },
     {
@@ -50,28 +35,718 @@
         "borders": {
             "NORTH": "WALL",
             "WEST": "WALL",
-            "SOUTH": "DISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 0,
+        "isBlocked": false,
+        "y": 2,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 0,
+        "isBlocked": false,
+        "y": 3,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 0,
+        "isBlocked": false,
+        "y": 4,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "WALL",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 0,
+        "isBlocked": false,
+        "y": 5,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "WALL",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 0,
+        "isBlocked": false,
+        "y": 6,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 1,
+        "isBlocked": false,
+        "y": 6,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 2,
+        "isBlocked": false,
+        "y": 6,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 3,
+        "isBlocked": false,
+        "y": 6,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "WALL",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 4,
+        "isBlocked": false,
+        "y": 6,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
             "EAST": "WALL"
         },
         "isColorField": false,
-        "x": 11,
+        "x": 5,
         "isBlocked": false,
-        "y": 8,
+        "y": 6,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "WALL"
+        },
+        "isColorField": false,
+        "x": 6,
+        "isBlocked": false,
+        "y": 6,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 6,
+        "isBlocked": false,
+        "y": 5,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "WALL"
+        },
+        "isColorField": false,
+        "x": 6,
+        "isBlocked": false,
+        "y": 4,
+        "priority": 0
+    },
+    {
+        "isEntrance": true,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 6,
+        "isBlocked": false,
+        "y": 3,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "WALL"
+        },
+        "isColorField": false,
+        "x": 6,
+        "isBlocked": false,
+        "y": 2,
         "priority": 0
     },
     {
         "isEntrance": false,
         "color": "#00FF00",
         "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "WALL"
+        },
+        "isColorField": true,
+        "x": 6,
+        "isBlocked": false,
+        "y": 1,
+        "priority": 2
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "WALL"
+        },
+        "isColorField": false,
+        "x": 6,
+        "isBlocked": false,
+        "y": 0,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 5,
+        "isBlocked": false,
+        "y": 0,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 4,
+        "isBlocked": false,
+        "y": 0,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 3,
+        "isBlocked": false,
+        "y": 0,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 2,
+        "isBlocked": false,
+        "y": 0,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 1,
+        "isBlocked": false,
+        "y": 0,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "WALL"
+        },
+        "isColorField": false,
+        "x": 7,
+        "isBlocked": false,
+        "y": 5,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "WALL",
+            "SOUTH": "WALL",
+            "EAST": "WALL"
+        },
+        "isColorField": false,
+        "x": 5,
+        "isBlocked": false,
+        "y": 1,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 1,
+        "isBlocked": false,
+        "y": 1,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 2,
+        "isBlocked": false,
+        "y": 1,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 3,
+        "isBlocked": false,
+        "y": 1,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 4,
+        "isBlocked": false,
+        "y": 1,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "WALL",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 4,
+        "isBlocked": false,
+        "y": 2,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
             "NORTH": "WALL",
             "WEST": "WALL",
             "SOUTH": "WALL",
-            "EAST": "DISCOVERED"
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 3,
+        "isBlocked": false,
+        "y": 2,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "WALL",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 3,
+        "isBlocked": false,
+        "y": 3,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#0000FF",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
         },
         "isColorField": true,
-        "x": 9,
+        "x": 3,
         "isBlocked": false,
-        "y": 9,
+        "y": 4,
+        "priority": 3
+    },
+    {
+        "isEntrance": false,
+        "color": "#FF0000",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "WALL",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "WALL"
+        },
+        "isColorField": true,
+        "x": 4,
+        "isBlocked": false,
+        "y": 4,
+        "priority": 1
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "WALL"
+        },
+        "isColorField": false,
+        "x": 4,
+        "isBlocked": false,
+        "y": 3,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "WALL"
+        },
+        "isColorField": false,
+        "x": 5,
+        "isBlocked": false,
+        "y": 3,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 5,
+        "isBlocked": false,
+        "y": 2,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "WALL"
+        },
+        "isColorField": false,
+        "x": 5,
+        "isBlocked": false,
+        "y": 5,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "WALL",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 2,
+        "isBlocked": false,
+        "y": 2,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "WALL",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 2,
+        "isBlocked": false,
+        "y": 3,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 1,
+        "isBlocked": false,
+        "y": 2,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 1,
+        "isBlocked": false,
+        "y": 3,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 1,
+        "isBlocked": false,
+        "y": 4,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 2,
+        "isBlocked": false,
+        "y": 4,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "WALL",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 2,
+        "isBlocked": false,
+        "y": 5,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "WALL",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 1,
+        "isBlocked": false,
+        "y": 5,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 4,
+        "isBlocked": false,
+        "y": 5,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 3,
+        "isBlocked": false,
+        "y": 5,
+        "priority": 0
+    },
+    {
+        "isEntrance": false,
+        "color": "#C0C0C0",
+        "borders": {
+            "NORTH": "UNDISCOVERED",
+            "WEST": "UNDISCOVERED",
+            "SOUTH": "UNDISCOVERED",
+            "EAST": "UNDISCOVERED"
+        },
+        "isColorField": false,
+        "x": 5,
+        "isBlocked": false,
+        "y": 4,
         "priority": 0
     }
 ]
