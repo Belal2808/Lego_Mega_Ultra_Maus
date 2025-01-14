@@ -2,6 +2,7 @@ package de.fhkiel.rob.legoosctester
 
 interface RobotStateService {
     var robotIp: String
+    var robotName: String
     var robotPort: Int
     var motorATargetReached : Boolean
     var motorBTargetReached : Boolean

@@ -3,8 +3,6 @@ package de.fhkiel.rob.legoosctester
 import org.koin.mp.KoinPlatform.getKoin
 import de.fhkiel.rob.legoosctester.osc.OSCSender
 import de.fhkiel.rob.legoosctester.osc.OSCReceiver
-import java.awt.Color
-import java.lang.Thread.sleep
 
 enum class RoboterControls{
     DISTANCE,AGAINSTWALL,NONE
@@ -20,73 +18,68 @@ class RobotController {
         OSCReceiver.addListener { path, args ->
             onMessageReceived(path, args)
         }
-        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/c/angle", 0)
+        OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/c/angle", 0)
     }
 
     fun driveToNextCell(): List<() -> Unit>{
         return listOf(
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/angle", 0) },
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/multirun/target", 200, 600, 600) }
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/a/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/b/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/ab/multirun/target", 200, 625, 625) }
         )
     }
 
     fun headbuttWall():List<() -> Unit>{
         return listOf(
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/angle", 0) },
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/multirun/target", 200, 150, 150) }
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/a/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/b/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/ab/multirun/target", 200, 150, 150) }
         )
 
     }
 
     fun turnLeft90Degree(): List<() -> Unit> {
         return listOf(
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/angle", 0) },
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/multirun/target", 200, 185, -185) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/a/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/b/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/ab/multirun/target", 200, 185, -185) },
         )
     }
 
     fun turnRight90Degree(): List<() -> Unit> {
         return listOf(
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/angle", 0) },
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/multirun/target", 200, -185, 185) }
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/a/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/b/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/ab/multirun/target", 200, -185, 185) }
         )
     }
 
     fun turn180Degree(): List<() -> Unit> {
         return listOf(
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/angle", 0) },
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/ab/multirun/target", 200, -370, 370) }
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/a/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/b/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/ab/multirun/target", 200, -370, 370) }
         )
     }
 
     fun turnEyes(eyesDirection: EyesDirection): List<() -> Unit> {
         return when (eyesDirection) {
             EyesDirection.FRONT -> listOf(
-                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/c/run/target", 300, 0) },
-                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/ultrasonic/s1/distance")}
+                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/c/run/target", 300, 0) },
+                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/ultrasonic/s1/distance")}
             )
             EyesDirection.RIGHT -> listOf(
-                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/c/run/target", 300, 95) },
-                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/ultrasonic/s1/distance")}
+                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/c/run/target", 300, -275) },
+                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/ultrasonic/s1/distance")}
             )
             EyesDirection.BACK -> listOf(
-                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/c/run/target", 300, 185) },
-                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/ultrasonic/s1/distance")}
+                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/c/run/target", 300, -185) },
+                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/ultrasonic/s1/distance")}
             )
             EyesDirection.LEFT -> listOf(
-                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/motor/c/run/target", 300, 275) },
-                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotIp}/ultrasonic/s1/distance")}
+                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/c/run/target", 300, -95) },
+                { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/ultrasonic/s1/distance")}
             )
-        }
-    }
-
-
-    fun look(): List<() -> Unit> {
-        return listOf {
-            OSCSender(
-                roboterState.robotIp,
-                roboterState.robotPort
-            ).send("/${roboterState.robotIp}/ultrasonic/s1/distance")
         }
     }
 
@@ -96,7 +89,7 @@ class RobotController {
             OSCSender(
                 roboterState.robotIp,
                 roboterState.robotPort
-            ).send("/${roboterState.robotIp}/color/s2")
+            ).send("/${roboterState.robotName}/color/s2")
         }
     }
 
@@ -113,47 +106,54 @@ class RobotController {
     }
 
     private fun onMessageReceived(path: String, args: List<Any>) {
+        println("$path with args $args")
 
-     if (path == "/OSCBrick@${roboterState.robotIp}/motor/a/target/reached" || path == "/OSCBrick@${roboterState.robotIp}/motor/a/angle/is") {
+     if (path == "/${roboterState.robotName}/motor/a/target/reached") {
                 roboterState.motorATargetReached = true
                 if(roboterState.motorATargetReached && roboterState.motorBTargetReached) {
                     roboterState.motorATargetReached = false
                     roboterState.motorBTargetReached = false
+                    println("nächster befehl call")
                     notifyMovementComplete(RoboterControls.NONE)
                 }
-        }else if (path == "/OSCBrick@${roboterState.robotIp}/motor/b/target/reached" || path == "/OSCBrick@${roboterState.robotIp}/motor/b/angle/is") {
+        }else if (path == "/${roboterState.robotName}/motor/b/target/reached") {
                 roboterState.motorBTargetReached = true
                 if (roboterState.motorATargetReached && roboterState.motorBTargetReached) {
                     roboterState.motorATargetReached = false
                     roboterState.motorBTargetReached = false
+                    println("nächster befehl call")
                     notifyMovementComplete(RoboterControls.NONE)
                 }
-        }else if(path == "/OSCBrick@${roboterState.robotIp}/motor/c/angle/is" && args[0] == 0){
+        }else if(path == "/${roboterState.robotName}/motor/c/angle/is" && args[0] == 0){
             // do nothing
-        }else if(path == "/OSCBrick@${roboterState.robotIp}/ultrasonic/s1/distance/is"){
+        }else if(path == "/${roboterState.robotName}/ultrasonic/s1/distance/is"){
             val currentsPosition = labyrinthState.getRobotPosition()
             val currentCell = labyrinthState.getCell(currentsPosition.first,currentsPosition.second)
-            val list = currentCell?.getUndiscoveredBorders()
+            val list = currentCell?.getNoneBorders()
             if(list == null){
+                println("nächster befehl call")
                 notifyMovementComplete(RoboterControls.NONE)
                 return
             }
             if(list.isEmpty()){
+                println("nächster befehl call")
                 notifyMovementComplete(RoboterControls.NONE)
                 return
             }
             if(args[0] as Int >250){
-                println(list.first())
                 labyrinthState.setCurrentCellBorder(list.first(),CellBoarder.UNDISCOVERED)
             }else{
-                println(list.first())
+                print("habe wand gesetzt")
                 labyrinthState.setCurrentCellBorder(list.first(),CellBoarder.WALL)
             }
+         println("nächster befehl call")
          notifyMovementComplete(RoboterControls.NONE)
-        } else if (path == "/OSCBrick@${roboterState.robotIp}/color/s2/is") {
+        } else if (path == "/${roboterState.robotName}/color/s2/is") {
          labyrinthState.processColorSensorData(args)
+         println("nächster befehl call")
          notifyMovementComplete(RoboterControls.NONE)
         }else{
+         println("nächster befehl call")
          notifyMovementComplete(RoboterControls.NONE)
      }
     }

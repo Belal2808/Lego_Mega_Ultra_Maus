@@ -1,7 +1,9 @@
 package de.fhkiel.rob.legoosctester
 
+import java.awt.Color
+
 class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService, private val movementPlanner: MovementPlanner){
-    private var lastCellDirection :RoboterDirection? = null
+    var lastCellDirection :RoboterDirection? = null
 
 
     fun driveWest(){
@@ -30,8 +32,7 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
     }
 
     fun scanCell() {
-        val position = labyrinthStateService.getRobotPosition()
-        var currentCell = labyrinthStateService.getCell(position.first,position.second)
+        var currentCell = labyrinthStateService.getCurrentCell()
         if(currentCell == null){
             currentCell = Cell()
         }
@@ -40,13 +41,20 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
         if (direction != null) {
             currentCell.setBorder(direction, CellBoarder.DISCOVERED)
         }
-        val undiscoveredBoardersList = currentCell.getUndiscoveredBorders()
+        val undiscoveredBoardersList = currentCell.getNoneBorders()
         if(undiscoveredBoardersList.isNotEmpty()){
             for(undiscoveredBoarder in undiscoveredBoardersList){
                 movementPlanner.planAndExecuteEyeMovement(undiscoveredBoarder)
             }
         }
-        movementPlanner.planAndExecuteColorScan()
+        if(currentCell.color == Color.DARK_GRAY) {
+            movementPlanner.planAndExecuteColorScan()
+        }
         movementPlanner.resetEyes()
+    }
+
+    fun resetRoboter() {
+        movementPlanner.resetEyes()
+        movementPlanner.resetRoboter()
     }
 }

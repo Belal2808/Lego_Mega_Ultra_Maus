@@ -40,6 +40,10 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
         return labyrinth
     }
 
+    override fun getCurrentCell(): Cell?{
+        return getCell(currentX,currentY)
+    }
+
     /**
      * Ruft eine Zelle ab, wenn sie existiert, sonst null.
      */
@@ -171,12 +175,15 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
             "red" -> {
                 currentCell.color = Color.RED
                 currentCell.isColorField = true
+                notifyListeners()
             }
             else -> {
                 currentCell.color = Color.LIGHT_GRAY
                 currentCell.isColorField = false
             }
+
         }
+
     }
 
 

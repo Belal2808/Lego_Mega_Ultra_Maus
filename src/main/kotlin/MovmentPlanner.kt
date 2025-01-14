@@ -7,7 +7,9 @@ class MovementPlanner(
 ) {
     fun planAndExecuteRoboterMovement(targetDirection: RoboterDirection) {
         val currentDirection = robotState.getRoboterDirection()
-        val movements = calculateMovementToTargetDirection(currentDirection, targetDirection)
+        val movements = mutableListOf<() -> Unit>()
+        movements.addAll(calculateMovementToTargetDirection(currentDirection, targetDirection))
+        movements.addAll((robotController.driveToNextCell()))
         robotState.setRoboterDirection(targetDirection)
         movementManager.enqueueMovements(movements)
     }
@@ -58,8 +60,13 @@ class MovementPlanner(
             }
         }
 
-        movements.addAll(robotController.driveToNextCell())
-
         return movements
+    }
+
+    fun resetRoboter() {
+        val currentDirection = robotState.getRoboterDirection()
+        val movements = calculateMovementToTargetDirection(currentDirection, RoboterDirection.NORTH)
+        robotState.setRoboterDirection(RoboterDirection.NORTH)
+        movementManager.enqueueMovements(movements)
     }
 }

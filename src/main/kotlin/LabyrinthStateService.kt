@@ -3,6 +3,7 @@ package de.fhkiel.rob.legoosctester
 interface LabyrinthStateService {
     fun updateCell(x: Int, y: Int,cell: Cell)
     fun getCell(x: Int, y: Int): Cell?
+    fun getCurrentCell(): Cell?
     fun processColorSensorData(args: List<Any>)
     fun getRobotPosition(): Pair<Int, Int>
     fun setRobotPosition(x: Int, y: Int)

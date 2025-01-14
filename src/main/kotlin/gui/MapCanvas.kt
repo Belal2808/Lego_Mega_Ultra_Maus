@@ -1,32 +1,49 @@
 package de.fhkiel.rob.legoosctester.gui
-
-import de.fhkiel.rob.legoosctester.Cell
 import de.fhkiel.rob.legoosctester.CellBoarder
 import de.fhkiel.rob.legoosctester.LabyrinthStateListener
 import de.fhkiel.rob.legoosctester.LabyrinthStateService
 import de.fhkiel.rob.legoosctester.RoboterDirection
 import org.koin.mp.KoinPlatform.getKoin
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Graphics
 import javax.swing.JPanel
 
 class MapCanvas : JPanel(), LabyrinthStateListener {
 
-    private val labyrinthState: LabyrinthStateService = getKoin().get()// Zustand der Karte
+    private val labyrinthState: LabyrinthStateService = getKoin().get()
+    private val cellSize = 30
+    private val maxCells = 20
 
     init {
         labyrinthState.addListener(this)
+        preferredSize = Dimension(cellSize * (maxCells+1), cellSize * (maxCells+1)) // 400x400
     }
 
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
 
-        val cellSize = 50
         val wallThickness = 5
+        val cells = labyrinthState.getCells()
+        val knownCellPositions = cells.keys
 
-        // Zeichne jede Zelle
-        for ((position, cell) in labyrinthState.getCells()) {
+        // Hintergrund und graue Raster zeichnen
+        val maxCells = 20
+        g.color = Color.LIGHT_GRAY // Hellgrau für unbekannte Zellumrandungen
+
+        for (x in 0 until maxCells) {
+            for (y in 0 until maxCells) {
+                val px = x * cellSize
+                val py = y * cellSize
+
+                // Zeichne die grauen Rahmen für alle Zellen
+                g.drawRect(px, py, cellSize, cellSize)
+            }
+        }
+
+        // Zeichne jede bekannte Zelle
+        for ((position, cell) in cells) {
             val (cx, cy) = position
             val px = cx * cellSize
             val py = cy * cellSize
@@ -35,8 +52,7 @@ class MapCanvas : JPanel(), LabyrinthStateListener {
             g.color = cell.color
             g.fillRect(px, py, cellSize, cellSize)
 
-            // 2) Walls anhand der borders-Map:
-            //    cell.getBorder(RoboterDirection.NORTH) / .EAST / .SOUTH / .WEST
+            // 2) Wände zeichnen
             g.color = Color.BLACK
 
             // NORTH
@@ -65,7 +81,6 @@ class MapCanvas : JPanel(), LabyrinthStateListener {
             // 4) Blockiert? (rotes X)
             if (cell.isBlocked) {
                 g.color = Color.RED
-                // Diagonalen
                 g.drawLine(px, py, px + cellSize, py + cellSize)
                 g.drawLine(px, py + cellSize, px + cellSize, py)
                 g.drawString("X", px + cellSize / 4, py + (3 * cellSize / 4))
@@ -79,10 +94,11 @@ class MapCanvas : JPanel(), LabyrinthStateListener {
             val size = cellSize / 3
 
             g.color = Color.MAGENTA
-            val (xPoints, yPoints) = getRobotTrianglePoints(px, py, size, RoboterDirection.NORTH) //To do
+            val (xPoints, yPoints) = getRobotTrianglePoints(px, py, size, RoboterDirection.NORTH)
             g.fillPolygon(xPoints, yPoints, 3)
         }
     }
+
 
     /**
      * Bestimmt die Eckpunkte des Roboter-Dreiecks in Abhängigkeit von RoboterDirection.

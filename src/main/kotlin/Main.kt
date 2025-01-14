@@ -12,6 +12,7 @@ val appModule = module {
     single { MovementManager(get()) }
     single { MovementPlanner(get(), get(), get())}
     single { LabyrinthExplorer(get(), get()) }
+    single { AutomaticExplorer(get(), get(),get()) }
 }
 
 fun main() {

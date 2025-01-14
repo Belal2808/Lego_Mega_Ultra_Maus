@@ -10,7 +10,7 @@ data class Cell(
         RoboterDirection.WEST to CellBoarder.NONE
     ),
 
-    var color: Color = Color.LIGHT_GRAY, // Standardfarbe
+    var color: Color = Color.darkGray, // Standardfarbe
     var isEntrance: Boolean = false, // Eingang
     var isColorField: Boolean = false, // Farbfeld
     var priority: Int = 0, // Priorität für Farbplatten
@@ -22,10 +22,16 @@ data class Cell(
         borders[direction] = border
     }
 
-    fun getUndiscoveredBorders(): List<RoboterDirection> {
+    fun getNoneBorders(): List<RoboterDirection> {
         return borders.filter { it.value == CellBoarder.NONE }
             .map { it.key }
     }
+
+    fun getUndiscoveredBorders(): List<RoboterDirection> {
+        return borders.filter { it.value == CellBoarder.UNDISCOVERED }
+            .map { it.key }
+    }
+
 }
 
 enum class CellBoarder{

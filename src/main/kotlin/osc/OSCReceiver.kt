@@ -4,7 +4,6 @@ import com.illposed.osc.MessageSelector
 import com.illposed.osc.OSCMessageEvent
 import com.illposed.osc.transport.OSCPortIn
 import de.fhkiel.rob.legoosctester.RobotStateService
-import de.fhkiel.rob.legoosctester.gui.Incoming.log
 import org.koin.mp.KoinPlatform.getKoin
 import kotlin.concurrent.thread
 
@@ -17,7 +16,7 @@ object OSCReceiver {
 
     private val listeners = mutableListOf<(String, List<Any>) -> Unit>()
 
-    var prefixFilter: String = "/OSCBrick@${roboterState.robotIp}"
+    var prefixFilter: String = "/${roboterState.robotName}"
 
     fun addListener(listener: (String, List<Any>) -> Unit) {
         listeners.add(listener)
@@ -30,7 +29,6 @@ object OSCReceiver {
                 override fun isInfoRequired(): Boolean = false
 
                 override fun matches(messageEvent: OSCMessageEvent?): Boolean {
-                    // Filter basierend auf dem Prefix
                     return messageEvent?.message?.address?.startsWith(prefixFilter) == true
                 }
             }
@@ -39,7 +37,6 @@ object OSCReceiver {
                 val path = event.message.address
                 val args = event.message.arguments
                 listeners.forEach { it(path, args) }
-                newMessage(path, args)
             }
         }
         thread { receiver.startListening() }
@@ -52,9 +49,5 @@ object OSCReceiver {
             receiver.stopListening()
             this.port = -1
         }
-    }
-
-    private fun newMessage(path: String, args: List<Any>) {
-        log(path, "${args}")
     }
 }
