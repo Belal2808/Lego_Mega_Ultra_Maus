@@ -28,8 +28,13 @@ class MainGUI : JFrame() {
         constraints.gridx = 1
         constraints.gridy = 1
         constraints.anchor = GridBagConstraints.SOUTHEAST
-        constraints.fill = GridBagConstraints.NONE
+        constraints.fill = GridBagConstraints.BOTH
         add(controlPanel, constraints)
+
+        // Verbindung zwischen MapCanvas und ControlPanel herstellen
+        mapCanvas.selectedCellListener = { position, cell ->
+            controlPanel.updateCellInfo(position, cell)
+        }
 
         constraints.gridwidth = 2
         constraints.gridx = 0

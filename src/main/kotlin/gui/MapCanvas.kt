@@ -1,12 +1,11 @@
 package de.fhkiel.rob.legoosctester.gui
-import de.fhkiel.rob.legoosctester.CellBoarder
-import de.fhkiel.rob.legoosctester.LabyrinthStateListener
-import de.fhkiel.rob.legoosctester.LabyrinthStateService
-import de.fhkiel.rob.legoosctester.RoboterDirection
+import de.fhkiel.rob.legoosctester.*
 import org.koin.mp.KoinPlatform.getKoin
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.JPanel
 
 class MapCanvas : JPanel(), LabyrinthStateListener {
@@ -14,10 +13,18 @@ class MapCanvas : JPanel(), LabyrinthStateListener {
     private val labyrinthState: LabyrinthStateService = getKoin().get()
     private val cellSize = 30
     private val maxCells = 20
-
+    var selectedCellListener: ((Pair<Int, Int>, Cell?) -> Unit)? = null
     init {
         labyrinthState.addListener(this)
         preferredSize = Dimension(cellSize * (maxCells+1), cellSize * (maxCells+1)) // 400x400
+        addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                val x = e.x / cellSize
+                val y = e.y / cellSize
+                val cell = labyrinthState.getCell(x, y)
+                selectedCellListener?.invoke(Pair(x, y), cell) // Callback auslösen
+            }
+        })
     }
 
 
@@ -100,9 +107,7 @@ class MapCanvas : JPanel(), LabyrinthStateListener {
     }
 
 
-    /**
-     * Bestimmt die Eckpunkte des Roboter-Dreiecks in Abhängigkeit von RoboterDirection.
-     */
+
     private fun getRobotTrianglePoints(
         centerX: Int,
         centerY: Int,
