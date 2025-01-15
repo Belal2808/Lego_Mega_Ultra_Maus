@@ -31,6 +31,16 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
         movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.SOUTH)
     }
 
+    fun headButtWall(){
+        val walls = labyrinthStateService.getCurrentCell()!!.getWallBorders()
+        if(walls.isEmpty()){
+            return
+        }else{
+            print(walls[0])
+            movementPlanner.headButtWall(walls[0])
+        }
+    }
+
     fun scanCell() {
         var currentCell = labyrinthStateService.getCurrentCell()
         if(currentCell == null){

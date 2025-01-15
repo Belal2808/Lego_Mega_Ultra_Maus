@@ -8,7 +8,6 @@ import java.awt.Color
 import java.io.File
 
 class MapLoader {
-    private val mapCanvas: MapCanvas = KoinPlatform.getKoin().get()
     companion object {
         fun exportMap(labyrinthState: LabyrinthStateService, filename: String) {
             val file = File(filename)

@@ -4,5 +4,6 @@ import javax.swing.*
 
 class RobotInfoPanel() : JPanel() {
     init {
+
     }
 }

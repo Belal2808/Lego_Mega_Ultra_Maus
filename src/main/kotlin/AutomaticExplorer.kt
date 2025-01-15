@@ -55,6 +55,8 @@ class AutomaticExplorer(private val labyrinthStateService: LabyrinthStateService
             driveToLastCell()
             return
         }
+        labyrinthExplorer.headButtWall()
+
         when(undiscoveredBoarders[0]){
             RoboterDirection.NORTH -> {
                 drivenPath.push(labyrinthStateService.getRobotPosition())

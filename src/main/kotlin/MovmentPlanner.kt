@@ -27,6 +27,15 @@ class MovementPlanner(
         movementManager.enqueueMovements(movements)
     }
 
+    fun headButtWall(direction: RoboterDirection){
+        val movements = mutableListOf<() -> Unit>()
+        movements.addAll(calculateMovementToTargetDirection(robotState.getRoboterDirection(),direction))
+        movements.add {robotController.headbuttWall()}
+        movements.addAll(robotController.driveBack())
+        robotState.setRoboterDirection(direction)
+        movementManager.enqueueMovements(movements)
+    }
+
     private fun calculateEyeMovementToTargetDirection( currentDirection: RoboterDirection, targetDirection: RoboterDirection): List<() -> Unit> {
         val movements = mutableListOf<() -> Unit>()
 

@@ -29,13 +29,12 @@ class RobotController {
         )
     }
 
-    fun headbuttWall():List<() -> Unit>{
-        return listOf(
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/a/angle", 0) },
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/b/angle", 0) },
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/ab/multirun/target", 200, 150, 150) }
-        )
+    fun headbuttWall(){
+        val oscSender = OSCSender(roboterState.robotIp, roboterState.robotPort)
 
+        oscSender.send("/${roboterState.robotName}/motor/a/run", 100)
+        oscSender.send("/${roboterState.robotName}/motor/b/run", 100)
+        oscSender.send("/${roboterState.robotName}/touch/s4")
     }
 
     fun turnLeft90Degree(): List<() -> Unit> {
@@ -93,9 +92,13 @@ class RobotController {
         }
     }
 
-
-
-
+    fun driveBack(): List<() -> Unit>{
+        return listOf(
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/a/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/b/angle", 0) },
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/ab/multirun/target", 200, -150, -150) }
+        )
+    }
 
     fun addMovementCompleteListener(listener: (RoboterControls) -> Unit) {
         movementListeners.add(listener)
@@ -152,6 +155,18 @@ class RobotController {
          labyrinthState.processColorSensorData(args)
          println("nächster befehl call")
          notifyMovementComplete(RoboterControls.NONE)
+        }else if(path == "/${roboterState.robotName}/touch/s4/pressed"){
+           if(args[0]==true){
+               OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/a/stop")
+               OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/b/stop")
+               notifyMovementComplete(RoboterControls.NONE)
+           }else {
+               Thread.sleep(1000)
+               OSCSender(
+                   roboterState.robotIp,
+                   roboterState.robotPort
+               ).send("/${roboterState.robotName}/touch/s4")
+           }
         }else{
          println("nächster befehl call")
          notifyMovementComplete(RoboterControls.NONE)

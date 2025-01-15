@@ -14,6 +14,8 @@ class MainGUI : JFrame() {
         layout = gridBagLayout
         constraints.insets = Insets(10, 15, 10, 15)
 
+
+
         constraints.gridx = 0
         constraints.gridy = 1
         constraints.fill = GridBagConstraints.BOTH
