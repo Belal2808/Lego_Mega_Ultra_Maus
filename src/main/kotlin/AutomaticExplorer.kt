@@ -26,6 +26,7 @@ class AutomaticExplorer(private val labyrinthStateService: LabyrinthStateService
         if (!fullyExplored) {
             getCellInformation()
         } else {
+            movementManager.removeMovementQueueListener(this)
             println("Labyrinth vollständig erkundet!")
         }
     }
@@ -78,6 +79,7 @@ class AutomaticExplorer(private val labyrinthStateService: LabyrinthStateService
     }
 
     private fun driveToLastCell() {
+        labyrinthExplorer.headButtWall()
         if(drivenPath.isEmpty()){
             fullyExplored = true
             labyrinthExplorer.resetRoboter()

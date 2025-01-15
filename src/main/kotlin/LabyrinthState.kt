@@ -11,7 +11,11 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
     private val listeners = mutableListOf<LabyrinthStateListener>()
     private var currentX : Int = rows/2
     private var currentY : Int = columns/2
-    private val labyrinth = mutableMapOf<Pair<Int, Int>, Cell>() // Map von Koordinaten zu Zellen
+    private val labyrinth = mutableMapOf<Pair<Int, Int>, Cell>()
+
+    init {
+        addCell(currentX,currentY,Cell(isEntrance = true))
+    }
 
     override fun addListener(listener: LabyrinthStateListener) {
         listeners.add(listener)
@@ -68,25 +72,21 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
 
     override fun moveRoboterSouth() {
         currentY++
-        println(getRobotPosition().toString())
         notifyListeners()
     }
 
     override fun moveRoboterNorth() {
         currentY--
-        println(getRobotPosition().toString())
         notifyListeners()
     }
 
     override fun moveRoboterWest() {
-        currentX++
-        println(getRobotPosition().toString())
+        currentX--
         notifyListeners()
     }
 
     override fun moveRoboterEast() {
-        setRobotPosition(currentX-1,currentY)
-        println(getRobotPosition().toString())
+        currentX++
         notifyListeners()
     }
 
@@ -99,11 +99,7 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
     override fun getNeighbors(x: Int, y: Int): List<Pair<Int, Int>> {
         val neighbors = mutableListOf<Pair<Int, Int>>()
 
-        val currentCell = getCell(x, y)
-        if (currentCell == null) {
-            println("Warnung: Zelle ($x, $y) existiert nicht.")
-            return emptyList()
-        }
+        val currentCell = getCell(x, y) ?: return emptyList()
 
         // Nachbarn prüfen und bidirektionale Verbindungen sicherstellen
         // NORTH
@@ -150,7 +146,6 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
             }
         }
 
-        println("Ermittelte Nachbarn für Zelle ($x, $y): $neighbors")
         return neighbors
     }
 

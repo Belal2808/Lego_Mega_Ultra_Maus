@@ -36,7 +36,6 @@ class LabyrinthExplorer(private val labyrinthStateService: LabyrinthStateService
         if(walls.isEmpty()){
             return
         }else{
-            print(walls[0])
             movementPlanner.headButtWall(walls[0])
         }
     }

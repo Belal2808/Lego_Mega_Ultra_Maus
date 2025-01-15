@@ -88,7 +88,7 @@ class RobotController {
             OSCSender(
                 roboterState.robotIp,
                 roboterState.robotPort
-            ).send("/${roboterState.robotName}/color/s2")
+            ).send("/${roboterState.robotName}/color/s3")
         }
     }
 
@@ -116,7 +116,6 @@ class RobotController {
                 if(roboterState.motorATargetReached && roboterState.motorBTargetReached) {
                     roboterState.motorATargetReached = false
                     roboterState.motorBTargetReached = false
-                    println("nächster befehl call")
                     notifyMovementComplete(RoboterControls.NONE)
                 }
         }else if (path == "/${roboterState.robotName}/motor/b/target/reached") {
@@ -124,7 +123,6 @@ class RobotController {
                 if (roboterState.motorATargetReached && roboterState.motorBTargetReached) {
                     roboterState.motorATargetReached = false
                     roboterState.motorBTargetReached = false
-                    println("nächster befehl call")
                     notifyMovementComplete(RoboterControls.NONE)
                 }
         }else if(path == "/${roboterState.robotName}/motor/c/angle/is" && args[0] == 0){
@@ -134,26 +132,21 @@ class RobotController {
             val currentCell = labyrinthState.getCell(currentsPosition.first,currentsPosition.second)
             val list = currentCell?.getNoneBorders()
             if(list == null){
-                println("nächster befehl call")
                 notifyMovementComplete(RoboterControls.NONE)
                 return
             }
             if(list.isEmpty()){
-                println("nächster befehl call")
                 notifyMovementComplete(RoboterControls.NONE)
                 return
             }
             if(args[0] as Int >250){
                 labyrinthState.setCurrentCellBorder(list.first(),CellBoarder.UNDISCOVERED)
             }else{
-                print("habe wand gesetzt")
                 labyrinthState.setCurrentCellBorder(list.first(),CellBoarder.WALL)
             }
-         println("nächster befehl call")
          notifyMovementComplete(RoboterControls.NONE)
-        } else if (path == "/${roboterState.robotName}/color/s2/is") {
+        } else if (path == "/${roboterState.robotName}/color/s3/is") {
          labyrinthState.processColorSensorData(args)
-         println("nächster befehl call")
          notifyMovementComplete(RoboterControls.NONE)
         }else if(path == "/${roboterState.robotName}/touch/s4/pressed"){
            if(args[0]==true){
@@ -168,7 +161,6 @@ class RobotController {
                ).send("/${roboterState.robotName}/touch/s4")
            }
         }else{
-         println("nächster befehl call")
          notifyMovementComplete(RoboterControls.NONE)
      }
     }

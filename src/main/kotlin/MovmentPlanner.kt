@@ -50,7 +50,6 @@ class MovementPlanner(
     fun planAndExecuteColorScan() {
         val movements = robotController.smellColor()
         movementManager.enqueueMovements(movements)
-        println("Farbscan geplant und ausgeführt.")
     }
     private fun calculateMovementToTargetDirection(currentDirection: RoboterDirection, targetDirection: RoboterDirection): List<() -> Unit> {
         val movements = mutableListOf<() -> Unit>()

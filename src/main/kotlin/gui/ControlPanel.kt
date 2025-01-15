@@ -115,7 +115,6 @@ class ControlPanel : JPanel() {
                     }
                 }
                 labyrinthState.updateCell(currentCellPosition!!.first, currentCellPosition!!.second, updatedCell)
-                println("Zelle erfolgreich aktualisiert: $updatedCell")
             } catch (e: Exception) {
                 println("Fehler beim Aktualisieren der Zelle: ${e.message}")
             }

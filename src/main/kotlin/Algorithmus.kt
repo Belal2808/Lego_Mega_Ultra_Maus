@@ -8,7 +8,8 @@ import javax.swing.Timer // Für Zeitsteuerung
 
 class Algorithmus(
     private val labyrinthState: LabyrinthStateService,
-    private val mapCanvas: MapCanvas
+    private val mapCanvas: MapCanvas,
+    private val movementPlanner: MovementPlanner
 ) {
     private var movementTimer: Timer? = null
     private var currentPath: MutableList<Pair<Int, Int>> = mutableListOf()
@@ -95,12 +96,9 @@ class Algorithmus(
                     println("Pfad zum Eingang: $pathToEntrance")
                     currentPath.clear()
                     currentPath.addAll(pathToEntrance)
-
-                    movementTimer?.stop()
-                    movementTimer = Timer(500) {
-                        moveRobotOneStep(labyrinthState)
+                    while(currentPath.isNotEmpty()) {
+                        moveRobotOneStep(currentPath.removeAt(0))
                     }
-                    movementTimer?.start()
                 } else {
                     println("Kein gültiger Pfad zum Eingang gefunden.")
                 }
@@ -126,6 +124,7 @@ class Algorithmus(
             if (cellHere != null && cellHere.isColorField) {
                 cellHere.isColorField = false
             }
+            calculateAndMoveToNextTarget(labyrinthState)
             return
         }
 
@@ -149,55 +148,35 @@ class Algorithmus(
         mapCanvas.repaint()
         println("Pfad erfolgreich markiert.")
 
-        movementTimer?.stop()
         currentPath = path.toMutableList()
 
-        movementTimer = Timer(500) {
-            moveRobotOneStep(labyrinthState)
+        while(currentPath.isNotEmpty()) {
+            moveRobotOneStep(currentPath.removeAt(0))
         }
-        movementTimer?.start()
+        calculateAndMoveToNextTarget(labyrinthState)
     }
-    private fun moveRobotOneStep(labyrinthState: LabyrinthStateService) {
-        if (currentPath.isEmpty()) {
-            println("Pfad vollständig abgefahren. Stoppe Bewegung.")
-            movementTimer?.stop()
-
-            val pos = labyrinthState.getRobotPosition()
-            val cell = labyrinthState.getCell(pos.first, pos.second)
-            if (cell != null && cell.isColorField) {
-                println("Farbziel erreicht bei $pos.")
-                cell.color = Color.LIGHT_GRAY
-                cell.isColorField = false
-
-                // Überprüfen, ob weitere Ziele verfügbar sind
-                val targets = labyrinthState.getCells().filterValues { it.isColorField }.keys
-                if (targets.isEmpty()) {
-                    println("Alle Farbziele abgefahren. Rückkehr zum Eingang.")
-                    val entrance = labyrinthState.getCells().entries.find { it.value.isEntrance }?.key
-                    if (entrance != null) {
-                        val pathToEntrance = findPathDijkstra(pos, entrance)
-                        if (pathToEntrance.isNotEmpty()) {
-                            println("Pfad zum Eingang berechnet: $pathToEntrance")
-                            currentPath.addAll(pathToEntrance)
-                            movementTimer?.start()
-                        } else {
-                            println("Kein gültiger Pfad zum Eingang gefunden.")
-                        }
-                    } else {
-                        println("Kein Eingang definiert.")
-                    }
-                } else {
-                    // Nächstes Ziel ansteuern
-                    calculateAndMoveToNextTarget(labyrinthState)
-                }
-            }
-            return
+    private fun moveRobotOneStep(nextTarget: Pair<Int,Int>) {
+        val pos = labyrinthState.getRobotPosition()
+        println("Bewege Roboter zu: $nextTarget")
+        val xDifference =nextTarget.first-pos.first
+        val yDifference = nextTarget.second-pos.second
+        if(xDifference == 1 ){
+            labyrinthState.moveRoboterEast()
+            movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.EAST)
+        }else if(xDifference == -1){
+            labyrinthState.moveRoboterWest()
+            movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.WEST)
+        }else if(yDifference == 1){
+            labyrinthState.moveRoboterSouth()
+            movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.SOUTH)
+        }else if(yDifference == -1){
+            labyrinthState.moveRoboterNorth()
+            movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.NORTH)
+        }else if (yDifference == 0 && xDifference == 0){
+            //do nothing
+        }else{
+            throw Exception("es geht heir nicht zurück und es ist alles kaputt")
         }
-
-        // Bewegung zum nächsten Punkt
-        val nextCoord = currentPath.removeAt(0)
-        println("Bewege Roboter zu: $nextCoord")
-        labyrinthState.setRobotPosition(nextCoord.first, nextCoord.second)
     }
 
     private fun removeCyanPath(labyrinthState: LabyrinthStateService) {
