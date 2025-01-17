@@ -1,7 +1,6 @@
 package de.fhkiel.rob.legoosctester
 
 import java.awt.Color
-import java.util.PriorityQueue
 
 interface LabyrinthStateListener {
     fun onStateChanged()
@@ -88,6 +87,16 @@ class LabyrinthState(rows: Int, columns: Int) : LabyrinthStateService {
     override fun moveRoboterEast() {
         currentX++
         notifyListeners()
+    }
+
+    override fun moveRoboterToDirection(direction: RoboterDirection){
+        when(direction){
+            RoboterDirection.EAST -> moveRoboterEast()
+            RoboterDirection.NORTH -> moveRoboterNorth()
+            RoboterDirection.WEST -> moveRoboterWest()
+            RoboterDirection.SOUTH -> moveRoboterSouth()
+        }
+
     }
 
     override fun setCurrentCellBorder(roboterDirection: RoboterDirection, cellBoarder: CellBoarder){

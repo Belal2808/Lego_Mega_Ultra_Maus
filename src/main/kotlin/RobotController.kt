@@ -12,6 +12,7 @@ class RobotController {
     private val roboterState : RobotStateService = getKoin().get()
     private val movementListeners = mutableListOf<(RoboterControls) -> Unit>()
     private val labyrinthState: LabyrinthStateService = getKoin().get()
+    private val listOfDirections: MutableList<RoboterDirection> = mutableListOf<RoboterDirection>()
 
 
     init {
@@ -22,6 +23,7 @@ class RobotController {
     }
 
     fun driveToNextCell(): List<() -> Unit>{
+        listOfDirections.add(roboterState.getRoboterDirection())
         return listOf(
             { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/a/angle", 0) },
             { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/b/angle", 0) },
@@ -57,7 +59,7 @@ class RobotController {
         return listOf(
             { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/a/angle", 0) },
             { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/b/angle", 0) },
-            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/ab/multirun/target", 200, -370, 370) }
+            { OSCSender(roboterState.robotIp, roboterState.robotPort).send("/${roboterState.robotName}/motor/ab/multirun/target", 200, -360, 360) }
         )
     }
 
@@ -114,6 +116,9 @@ class RobotController {
      if (path == "/${roboterState.robotName}/motor/a/target/reached") {
                 roboterState.motorATargetReached = true
                 if(roboterState.motorATargetReached && roboterState.motorBTargetReached) {
+                    if(args[0]==625&&listOfDirections.isNotEmpty()){
+                        roboterState.setRoboterPositionWithDirection(listOfDirections.removeFirst())
+                    }
                     roboterState.motorATargetReached = false
                     roboterState.motorBTargetReached = false
                     notifyMovementComplete(RoboterControls.NONE)
@@ -121,6 +126,9 @@ class RobotController {
         }else if (path == "/${roboterState.robotName}/motor/b/target/reached") {
                 roboterState.motorBTargetReached = true
                 if (roboterState.motorATargetReached && roboterState.motorBTargetReached) {
+                    if(args[0]==625&&listOfDirections.isNotEmpty()){
+                        roboterState.setRoboterPositionWithDirection(listOfDirections.removeFirst())
+                    }
                     roboterState.motorATargetReached = false
                     roboterState.motorBTargetReached = false
                     notifyMovementComplete(RoboterControls.NONE)

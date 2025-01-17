@@ -1,9 +1,8 @@
 package de.fhkiel.rob.legoosctester
 
 import de.fhkiel.rob.legoosctester.gui.MapCanvas
-import java.awt.Color // Für Farbinformationen
-import java.util.PriorityQueue // Für den Dijkstra-Algorithmus
-import javax.swing.Timer // Für Zeitsteuerung
+import java.awt.Color
+import java.util.PriorityQueue
 
 
 class Algorithmus(
@@ -11,7 +10,6 @@ class Algorithmus(
     private val mapCanvas: MapCanvas,
     private val movementPlanner: MovementPlanner
 ) {
-    private var movementTimer: Timer? = null
     private var currentPath: MutableList<Pair<Int, Int>> = mutableListOf()
     fun findPathDijkstra(start: Pair<Int, Int>, goal: Pair<Int, Int>): List<Pair<Int, Int>> {
         // Überprüfen, ob Start und Ziel existieren
@@ -154,12 +152,19 @@ class Algorithmus(
             moveRobotOneStep(currentPath.removeAt(0))
         }
         calculateAndMoveToNextTarget(labyrinthState)
+        return
     }
     private fun moveRobotOneStep(nextTarget: Pair<Int,Int>) {
         val pos = labyrinthState.getRobotPosition()
         println("Bewege Roboter zu: $nextTarget")
         val xDifference =nextTarget.first-pos.first
         val yDifference = nextTarget.second-pos.second
+        val walls = labyrinthState.getCurrentCell()!!.getWallBorders()
+        if(walls.isEmpty()){
+            return
+        }else{
+            movementPlanner.headButtWall(walls[0])
+        }
         if(xDifference == 1 ){
             labyrinthState.moveRoboterEast()
             movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.EAST)

@@ -60,18 +60,22 @@ class AutomaticExplorer(private val labyrinthStateService: LabyrinthStateService
 
         when(undiscoveredBoarders[0]){
             RoboterDirection.NORTH -> {
+                currentCell.setBorder(RoboterDirection.NORTH,CellBoarder.DISCOVERED)
                 drivenPath.push(labyrinthStateService.getRobotPosition())
                 labyrinthExplorer.driveNorth()
             }
             RoboterDirection.WEST -> {
+                currentCell.setBorder(RoboterDirection.WEST,CellBoarder.DISCOVERED)
                 drivenPath.push(labyrinthStateService.getRobotPosition())
                 labyrinthExplorer.driveWest()
             }
             RoboterDirection.EAST -> {
+                currentCell.setBorder(RoboterDirection.EAST,CellBoarder.DISCOVERED)
                 drivenPath.push(labyrinthStateService.getRobotPosition())
                 labyrinthExplorer.driveEast()
             }
             RoboterDirection.SOUTH -> {
+                currentCell.setBorder(RoboterDirection.SOUTH,CellBoarder.DISCOVERED)
                 drivenPath.push(labyrinthStateService.getRobotPosition())
                 labyrinthExplorer.driveSouth()
             }

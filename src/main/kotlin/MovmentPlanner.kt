@@ -9,8 +9,8 @@ class MovementPlanner(
         val currentDirection = robotState.getRoboterDirection()
         val movements = mutableListOf<() -> Unit>()
         movements.addAll(calculateMovementToTargetDirection(currentDirection, targetDirection))
-        movements.addAll((robotController.driveToNextCell()))
         robotState.setRoboterDirection(targetDirection)
+        movements.addAll((robotController.driveToNextCell()))
         movementManager.enqueueMovements(movements)
     }
 

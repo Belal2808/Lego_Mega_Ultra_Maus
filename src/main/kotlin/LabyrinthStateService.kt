@@ -7,6 +7,7 @@ interface LabyrinthStateService {
     fun processColorSensorData(args: List<Any>)
     fun getRobotPosition(): Pair<Int, Int>
     fun setRobotPosition(x: Int, y: Int)
+    fun moveRoboterToDirection(direction: RoboterDirection)
     fun moveRoboterSouth()
     fun moveRoboterNorth()
     fun moveRoboterWest()

@@ -8,14 +8,17 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JPanel
 
-class MapCanvas : JPanel(), LabyrinthStateListener {
+class MapCanvas : JPanel(), LabyrinthStateListener,RoboterStateListener {
 
     private val labyrinthState: LabyrinthStateService = getKoin().get()
+    private val roboterState: RobotStateService = getKoin().get()
     private val cellSize = 30
     private val maxCells = 20
     var selectedCellListener: ((Pair<Int, Int>, Cell?) -> Unit)? = null
     init {
+        roboterState.addListener(this)
         labyrinthState.addListener(this)
+
         preferredSize = Dimension(cellSize * (maxCells+1), cellSize * (maxCells+1)) // 400x400
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
@@ -95,7 +98,7 @@ class MapCanvas : JPanel(), LabyrinthStateListener {
         }
 
         // Zeichne den Roboter
-        labyrinthState.getRobotPosition().let { (rx, ry) ->
+        roboterState.getRobotPosition().let { (rx, ry) ->
             val px = rx * cellSize + cellSize / 2
             val py = ry * cellSize + cellSize / 2
             val size = cellSize / 3
