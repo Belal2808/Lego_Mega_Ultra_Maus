@@ -10,14 +10,26 @@ import java.io.File
 class MapLoader {
     companion object {
         fun exportMap(labyrinthState: LabyrinthStateService, filename: String) {
-            val file = File(filename)
-            val jsonArray = JSONArray()
+            val dotIndex = filename.lastIndexOf(".")
+            val (namePart, extensionPart) = if (dotIndex != -1) {
+                filename.substring(0, dotIndex) to filename.substring(dotIndex)
+            } else {
+                filename to ".json"
+            }
 
+            var index = 1
+            var newFile: File
+            do {
+                val newFilename = "${namePart}_$index$extensionPart"
+                newFile = File(newFilename)
+                index++
+            } while (newFile.exists())
+
+            val jsonArray = JSONArray()
             labyrinthState.getCells().forEach { (coords, cell) ->
                 val cellJson = JSONObject()
                 cellJson.put("x", coords.first)
                 cellJson.put("y", coords.second)
-
                 // Borders
                 val bordersObj = JSONObject()
                 for ((dir, border) in cell.borders) {
@@ -30,10 +42,12 @@ class MapLoader {
                 cellJson.put("isColorField", cell.isColorField)
                 cellJson.put("priority", cell.priority)
                 cellJson.put("isBlocked", cell.isBlocked)
+
                 jsonArray.put(cellJson)
             }
 
-            file.writeText(jsonArray.toString(4))
+            newFile.writeText(jsonArray.toString(4))
+            println("Karte exportiert in ${newFile.name}")
         }
 
         fun loadMap(labyrinthState: LabyrinthStateService, filename: String) {

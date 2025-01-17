@@ -70,21 +70,31 @@ class ControlPanel : JPanel() {
         currentCell = cell
         cellInfo.text = if (cell != null) {
             """
-            Position: $position
-            Farbe: ${colorToName(cell.color)}
-            Blockiert: ${cell.isBlocked}
-            Eingang: ${cell.isEntrance}
-            Priorität: ${cell.priority}
-            Wände: ${cell.borders.map { "${it.key}: ${it.value}" }.joinToString(", ")}
-            """.trimIndent()
+        Position: $position
+        Farbe: ${colorToName(cell.color)}
+        Blockiert: ${cell.isBlocked}
+        Eingang: ${cell.isEntrance}
+        Priorität: ${cell.priority}
+        Wände: ${cell.borders.map { "${it.key}=${it.value}" }.joinToString(", ")}
+        """.trimIndent()
         } else {
-            "Keine Zelle an dieser Position"
-        }
+            """
+        Position: $position
+        """.trimIndent()        }
     }
 
     private fun saveCellInfo() {
-        if (currentCellPosition != null && currentCell != null) {
-            val updatedCell = currentCell!!
+        if (currentCellPosition != null) {
+            val position = currentCellPosition!!
+            var updatedCell = labyrinthState.getCell(position.first, position.second)
+
+            // Neue Zelle erstellen, falls keine existiert
+            if (updatedCell == null) {
+                println("Keine bestehende Zelle an Position $position gefunden. Erstelle neue Zelle.")
+                updatedCell = Cell()
+            }
+
+            // Informationen aus dem Textbereich verarbeiten
             val lines = cellInfo.text.lines()
             try {
                 for (line in lines) {
@@ -104,9 +114,14 @@ class ControlPanel : JPanel() {
                         }
                         line.startsWith("Wände:") -> {
                             val borders = line.split(":")[1].trim().split(",").mapNotNull {
-                                val parts = it.split(":")
+                                val parts = it.split("=")
                                 if (parts.size == 2) {
-                                    RoboterDirection.valueOf(parts[0].trim()) to CellBoarder.valueOf(parts[1].trim())
+                                    try {
+                                        RoboterDirection.valueOf(parts[0].trim()) to CellBoarder.valueOf(parts[1].trim())
+                                    } catch (e: Exception) {
+                                        println("Fehler beim Parsen von Wänden: ${e.message}")
+                                        null
+                                    }
                                 } else null
                             }.toMap()
                             updatedCell.borders.clear()
@@ -114,9 +129,11 @@ class ControlPanel : JPanel() {
                         }
                     }
                 }
-                labyrinthState.updateCell(currentCellPosition!!.first, currentCellPosition!!.second, updatedCell)
+                // Zelle aktualisieren oder speichern
+                labyrinthState.updateCell(position.first, position.second, updatedCell)
+                println("Zelle erfolgreich aktualisiert: $updatedCell")
             } catch (e: Exception) {
-                println("Fehler beim Aktualisieren der Zelle: ${e.message}")
+                println("Fehler beim Speichern der Zelle: ${e.message}")
             }
         }
     }
