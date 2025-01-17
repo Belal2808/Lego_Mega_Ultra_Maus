@@ -14,7 +14,7 @@ val appModule = module {
     single { MovementPlanner(get(), get(), get())}
     single { LabyrinthExplorer(get(), get()) }
     single { MapCanvas() }
-    single { Algorithmus(get(), get(),get(),get()) }
+    single { Algorithmus(get(), get(),get()) }
     single { AutomaticExplorer(get(), get(),get()) }
 }
 
