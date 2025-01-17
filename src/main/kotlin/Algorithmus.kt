@@ -84,8 +84,8 @@ class Algorithmus(
         val targets = labyrinthState.getCells().filterValues { it.isColorField }.keys
         println("Aktuelle Farbziele: $targets")
 
-        if (targets.isEmpty()) {
-            println("Keine Farbzellen verfügbar. Zurück zum Eingang.")
+                if (targets.isEmpty()) {
+            println("Keine Farbzellen verfügbar. Versuche, zum Eingang zurückzukehren.")
             val entrancePosition = labyrinthState.getCells().entries.find { it.value.isEntrance }?.key
 
             if (entrancePosition != null) {
@@ -94,14 +94,15 @@ class Algorithmus(
                     println("Pfad zum Eingang: $pathToEntrance")
                     currentPath.clear()
                     currentPath.addAll(pathToEntrance)
-                    while(currentPath.isNotEmpty()) {
+
+                    while (currentPath.isNotEmpty()) {
                         moveRobotOneStep(currentPath.removeAt(0))
                     }
                 } else {
                     println("Kein gültiger Pfad zum Eingang gefunden.")
                 }
             } else {
-                println("Eingang nicht definiert.")
+                println("Eingang ist nicht definiert.")
             }
             return
         }
@@ -111,16 +112,15 @@ class Algorithmus(
             if (path.isNotEmpty()) path.size else Int.MAX_VALUE
         }
         if (nextTarget == null) {
-            println("Kein gültiger Pfad zu einer Farbzelle gefunden.")
+            println("Kein gültiger Pfad zu einer Farbzelle gefunden. Breche ab.")
             removeCyanPath(labyrinthState)
             return
         }
 
         if (nextTarget == currentPosition) {
-            println("Nächstes Ziel == aktueller Standort: $currentPosition. Deaktiviere isColorField.")
-            val cellHere = labyrinthState.getCell(currentPosition.first, currentPosition.second)
-            if (cellHere != null && cellHere.isColorField) {
-                cellHere.isColorField = false
+            println("Das nächste Ziel entspricht dem aktuellen Standort: $currentPosition. Entferne Markierung.")
+            labyrinthState.getCell(currentPosition.first, currentPosition.second)?.let { cell ->
+                if (cell.isColorField) cell.isColorField = false
             }
             calculateAndMoveToNextTarget(labyrinthState)
             return
@@ -128,7 +128,7 @@ class Algorithmus(
 
         val path = findPathDijkstra(currentPosition, nextTarget)
         if (path.isEmpty()) {
-            println("Kein gültiger Pfad zum Ziel gefunden.")
+            println("Kein gültiger Pfad zum Ziel gefunden. Breche ab.")
             removeCyanPath(labyrinthState)
             return
         }
@@ -136,7 +136,6 @@ class Algorithmus(
         println("Berechneter Pfad: $path")
         removeCyanPath(labyrinthState)
 
-        // Markiere Pfad als CYAN
         for ((px, py) in path) {
             val oldCell = labyrinthState.getCell(px, py) ?: Cell()
             if (!oldCell.isBlocked && oldCell.color == Color.LIGHT_GRAY) {
@@ -144,43 +143,50 @@ class Algorithmus(
             }
         }
         mapCanvas.repaint()
-        println("Pfad erfolgreich markiert.")
+        println("Pfad erfolgreich als CYAN markiert.")
 
         currentPath = path.toMutableList()
-
-        while(currentPath.isNotEmpty()) {
+        while (currentPath.isNotEmpty()) {
             moveRobotOneStep(currentPath.removeAt(0))
         }
+
+        // 6) Nachdem der Pfad abgefahren ist, erneut nach dem nächsten Ziel suchen
         calculateAndMoveToNextTarget(labyrinthState)
-        return
     }
-    private fun moveRobotOneStep(nextTarget: Pair<Int,Int>) {
-        val pos = labyrinthState.getRobotPosition()
-        println("Bewege Roboter zu: $nextTarget")
-        val xDifference =nextTarget.first-pos.first
-        val yDifference = nextTarget.second-pos.second
-        val walls = labyrinthState.getCurrentCell()!!.getWallBorders()
-        if(walls.isEmpty()){
-            return
-        }else{
+
+    private fun moveRobotOneStep(nextTarget: Pair<Int, Int>) {
+        val currentPos = labyrinthState.getRobotPosition()
+        println("Bewege Roboter von $currentPos nach $nextTarget")
+
+        val xDiff = nextTarget.first - currentPos.first
+        val yDiff = nextTarget.second - currentPos.second
+
+        val walls = labyrinthState.getCurrentCell()?.getWallBorders().orEmpty()
+        if (walls.isNotEmpty()) {
             movementPlanner.headButtWall(walls[0])
         }
-        if(xDifference == 1 ){
-            labyrinthState.moveRoboterEast()
-            movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.EAST)
-        }else if(xDifference == -1){
-            labyrinthState.moveRoboterWest()
-            movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.WEST)
-        }else if(yDifference == 1){
-            labyrinthState.moveRoboterSouth()
-            movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.SOUTH)
-        }else if(yDifference == -1){
-            labyrinthState.moveRoboterNorth()
-            movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.NORTH)
-        }else if (yDifference == 0 && xDifference == 0){
-            //do nothing
-        }else{
-            throw Exception("es geht heir nicht zurück und es ist alles kaputt")
+
+        when {
+            xDiff == 1 -> {
+                labyrinthState.moveRoboterEast()
+                movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.EAST)
+            }
+            xDiff == -1 -> {
+                labyrinthState.moveRoboterWest()
+                movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.WEST)
+            }
+            yDiff == 1 -> {
+                labyrinthState.moveRoboterSouth()
+                movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.SOUTH)
+            }
+            yDiff == -1 -> {
+                labyrinthState.moveRoboterNorth()
+                movementPlanner.planAndExecuteRoboterMovement(RoboterDirection.NORTH)
+            }
+            xDiff == 0 && yDiff == 0 -> {
+                //do nothing
+            }
+            else -> throw Exception("es geht heir nicht zurück und es ist alles kaputt")
         }
     }
 
